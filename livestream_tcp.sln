@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual C# Express 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LiveStream", "LiveStream\LiveStream.csproj", "{58B7B727-81C9-4C62-813A-08C394560186}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{58B7B727-81C9-4C62-813A-08C394560186}.Release|x86.ActiveCfg = Release|Any CPU
+		{58B7B727-81C9-4C62-813A-08C394560186}.Release|x86.Build.0 = Release|Any CPU
+		{58B7B727-81C9-4C62-813A-08C394560186}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{58B7B727-81C9-4C62-813A-08C394560186}.Debug|x86.Build.0 = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

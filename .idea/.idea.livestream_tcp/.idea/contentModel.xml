@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ContentModelStore">
+    <e p="C:\Users\Daniel\.Rider2019.2\system\extResources" t="IncludeRecursive" />
+    <e p="C:\Users\Daniel\.Rider2019.2\system\resharper-host\local\Transient\ReSharperHost\v192\SolutionCaches\_livestream_tcp.-1693157659.00" t="ExcludeRecursive" />
+    <e p="D:\dev\livestream2" t="IncludeFlat">
+      <e p="LiveStream" t="IncludeRecursive">
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="BlockingQueue.cs" t="Include" />
+        <e p="Chunk.cs" t="Include" />
+        <e p="CmdArgs.cs" t="Include" />
+        <e p="Connection.cs" t="Include" />
+        <e p="ConnectionPool.cs" t="Include" />
+        <e p="ConsoleWriterSink.cs" t="Include" />
+        <e p="Distributor.cs" t="Include" />
+        <e p="HttpSink.cs" t="Include" />
+        <e p="HttpSource.cs" t="Include" />
+        <e p="IChunk.cs" t="Include" />
+        <e p="IConnectionPool.cs" t="Include" />
+        <e p="IM2TCPConnection.cs" t="Include" />
+        <e p="ISink.cs" t="Include" />
+        <e p="ISource.cs" t="Include" />
+        <e p="LiveStream.csproj" t="IncludeRecursive" />
+        <e p="Logger.cs" t="Include" />
+        <e p="M2TCPConnection.cs" t="Include" />
+        <e p="M2TCPConnectionManager.cs" t="Include" />
+        <e p="M2TCPSink.cs" t="Include" />
+        <e p="M2TCPSource.cs" t="Include" />
+        <e p="MediaQueue.cs" t="Include" />
+        <e p="MTCPSink.cs" t="Include" />
+        <e p="MTCPSource.cs" t="Include" />
+        <e p="NetworkStreamExtensions.cs" t="Include" />
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Release" t="Include">
+            <e p="net40" t="Include">
+              <e p="LiveStream.AssemblyInfo.cs" t="Include" />
+            </e>
+            <e p="netcoreapp3.0" t="Include">
+              <e p="LiveStream.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+        <e p="Options.cs" t="Include" />
+        <e p="Program.cs" t="Include" />
+        <e p="SinkFactory.cs" t="Include" />
+        <e p="SourceFactory.cs" t="Include" />
+        <e p="UdpSource.cs" t="Include" />
+        <e p="WorkChunk.cs" t="Include" />
+      </e>
+      <e p="livestream_tcp.sln" t="IncludeFlat" />
+      <e p="packages" t="ExcludeRecursive" />
+    </e>
+  </component>
+</project>

@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="c03283c8-e868-45be-b2f5-7bd9c4f5b528" name="Default Changelist" comment="" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/LiveStream/NetworkStreamExtensions.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LiveStream/Options.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7AEAEB24-8981-45CC-ABA0-607F472C03E0/c5/750da043/HttpListener.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LiveStream/MTCPSink.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LiveStream/M2TCPSink.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LiveStream/ISink.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Properties/AssemblyInfo.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LiveStream/HttpSource.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LiveStream/UdpSource.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LiveStream/SinkFactory.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LiveStream/WorkChunk.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LiveStream/SourceFactory.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LiveStream/Chunk.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/81FEDA12-A73F-403C-B2F3-5E273BDB76B2/a0/5a878d5a/Thread.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LiveStream/M2TCPConnection.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LiveStream/ConnectionPool.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LiveStream/M2TCPConnectionManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LiveStream/MediaQueue.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LiveStream/IM2TCPConnection.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/81FEDA12-A73F-403C-B2F3-5E273BDB76B2/aa/73d0f96b/Monitor.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LiveStream/M2TCPSource.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LiveStream/BlockingQueue.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LiveStream/ConsoleWriterSink.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LiveStream/Logger.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LiveStream/Distributor.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LiveStream/CmdArgs.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LiveStream/ISource.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LiveStream/MTCPSource.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/947CFA9E-93C5-4D21-8EE6-CD975672A1F8/98/a3b77826/Stream.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LiveStream/IConnectionPool.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LiveStream/HttpSink.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/947CFA9E-93C5-4D21-8EE6-CD975672A1F8/d8/bd1bc331/ArrayPool`1.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LiveStream/Program.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LiveStream/IChunk.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/8F7E9BB6-05CA-4FB7-9F62-890B176B83F2/5e/4076e356/TcpListener.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LiveStream/Connection.cs" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/IReceiver.cs" />
+        <option value="$PROJECT_DIR$/ReceiverFactory.cs" />
+        <option value="$PROJECT_DIR$/BlockingQueue.cs" />
+        <option value="$PROJECT_DIR$/UdpReceiver.cs" />
+        <option value="$PROJECT_DIR$/Uploader.cs" />
+        <option value="$PROJECT_DIR$/Connection.cs" />
+        <option value="$PROJECT_DIR$/NetworkStreamExtension.cs" />
+        <option value="$PROJECT_DIR$/ISink.cs" />
+        <option value="$PROJECT_DIR$/ConsoleWriterSink.cs" />
+        <option value="$PROJECT_DIR$/ISource.cs" />
+        <option value="$PROJECT_DIR$/UdpSource.cs" />
+        <option value="$PROJECT_DIR$/Distributor.cs" />
+        <option value="$PROJECT_DIR$/WorkChunk.cs" />
+        <option value="$PROJECT_DIR$/NetworkStreamExtensions.cs" />
+        <option value="$PROJECT_DIR$/MTCPSink.cs" />
+        <option value="$PROJECT_DIR$/IChunk.cs" />
+        <option value="$PROJECT_DIR$/MediaQueue.cs" />
+        <option value="$PROJECT_DIR$/Chunk.cs" />
+        <option value="$PROJECT_DIR$/SourceFactory.cs" />
+        <option value="$PROJECT_DIR$/CmdArgs.cs" />
+        <option value="$PROJECT_DIR$/SinkFactory.cs" />
+        <option value="$PROJECT_DIR$/Logger.cs" />
+        <option value="$PROJECT_DIR$/MTCPSource.cs" />
+        <option value="$PROJECT_DIR$/Program.cs" />
+        <option value="$PROJECT_DIR$/HttpSource.cs" />
+        <option value="$PROJECT_DIR$/ConnectionPool.cs" />
+        <option value="$PROJECT_DIR$/HttpSink.cs" />
+        <option value="$PROJECT_DIR$/LiveStream/Class1.cs" />
+        <option value="$PROJECT_DIR$/LiveStream/MTCPSource.cs" />
+        <option value="$PROJECT_DIR$/LiveStream/UdpSource.cs" />
+        <option value="$PROJECT_DIR$/LiveStream/NetworkStreamExtensions.cs" />
+        <option value="$PROJECT_DIR$/LiveStream/SinkFactory.cs" />
+        <option value="$PROJECT_DIR$/LiveStream/CmdArgs.cs" />
+        <option value="$PROJECT_DIR$/LiveStream/SourceFactory.cs" />
+        <option value="$PROJECT_DIR$/LiveStream/M2TCPSource.cs" />
+        <option value="$PROJECT_DIR$/LiveStream/IM2TCPConnection.cs" />
+        <option value="$PROJECT_DIR$/LiveStream/IConnection.cs" />
+        <option value="$PROJECT_DIR$/LiveStream/HttpSource.cs" />
+        <option value="$PROJECT_DIR$/LiveStream/MediaQueue.cs" />
+        <option value="$PROJECT_DIR$/LiveStream/Distributor.cs" />
+        <option value="$PROJECT_DIR$/LiveStream/ConnectionPool.cs" />
+        <option value="$PROJECT_DIR$/LiveStream/HttpSink.cs" />
+        <option value="$PROJECT_DIR$/LiveStream/ISink.cs" />
+        <option value="$PROJECT_DIR$/LiveStream/IConnectionPool.cs" />
+        <option value="$PROJECT_DIR$/LiveStream/ConsoleWriterSink.cs" />
+        <option value="$PROJECT_DIR$/LiveStream/M2TCPSink.cs" />
+        <option value="$PROJECT_DIR$/LiveStream/M2TCPConnectionManager.cs" />
+        <option value="$PROJECT_DIR$/LiveStream/MTCPSink.cs" />
+        <option value="$PROJECT_DIR$/LiveStream/Connection.cs" />
+        <option value="$PROJECT_DIR$/LiveStream/Program.cs" />
+        <option value="$PROJECT_DIR$/LiveStream/M2TCPConnection.cs" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectId" id="1Skpn8VyqZrOfyRTEIkL6coASLL" />
+  <component name="PropertiesComponent">
+    <property name="Rider.DefaultBreakpoints.AreToggled" value="true" />
+    <property name="Rider.ProjectViewActivator.IsNotFirstRun" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="settings.editor.selected.configurable" value="SolutionBuilderGeneralOptionsPageId" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager">
+    <configuration name="Default" type="DotNetProject" factoryName=".NET Project">
+      <option name="EXE_PATH" value="$PROJECT_DIR$/LiveStream/bin/Release/netcoreapp3.0/LiveStream.dll" />
+      <option name="PROGRAM_PARAMETERS" value="--sinkhttp --sinkhttpport 61666 --m2tcp --m2tcphost 221.249.141.13 --m2tcpport 13999 --m2tcpconn 16" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/LiveStream/bin/Release/netcoreapp3.0" />
+      <option name="PASS_PARENT_ENVS" value="1" />
+      <option name="USE_EXTERNAL_CONSOLE" value="0" />
+      <option name="USE_MONO" value="0" />
+      <option name="RUNTIME_ARGUMENTS" value="" />
+      <option name="PROJECT_PATH" value="$PROJECT_DIR$/LiveStream/LiveStream.csproj" />
+      <option name="PROJECT_EXE_PATH_TRACKING" value="1" />
+      <option name="PROJECT_ARGUMENTS_TRACKING" value="1" />
+      <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="1" />
+      <option name="PROJECT_KIND" value="DotNetCore" />
+      <option name="PROJECT_TFM" value=".NETCoreApp,Version=v3.0" />
+      <method v="2">
+        <option name="Build" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="c03283c8-e868-45be-b2f5-7bd9c4f5b528" name="Default Changelist" comment="" />
+      <created>1557539244482</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1557539244482</updated>
+      <workItem from="1557539245693" duration="126000" />
+      <workItem from="1571688728195" duration="108000" />
+      <workItem from="1572086779845" duration="13092000" />
+      <workItem from="1572105743409" duration="8736000" />
+      <workItem from="1572116832639" duration="563000" />
+      <workItem from="1572117616836" duration="11884000" />
+      <workItem from="1572129658016" duration="669000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
+  <component name="UnityUnitTestConfiguration" currentTestLauncher="NUnit" />
+  <component name="VcsManagerConfiguration">
+    <option name="LOCAL_CHANGES_DETAILS_PREVIEW_SHOWN" value="true" />
+  </component>
+</project>
