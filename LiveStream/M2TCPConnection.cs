@@ -8,17 +8,13 @@ namespace LiveStream
     {
         private int fileId = 0;
 
-        private readonly int connectionId;
         private readonly int seed;
         private readonly MediaQueue queue;
-        private readonly IConnection connection;
+        private readonly Connection connection;
         private readonly List<WorkChunk> workItems = new List<WorkChunk>();
-        private readonly M2TCPConnectionManager m2TcpConnectionManager;
 
-        public M2TCPConnection(int connectionId, IConnectionPool connectionPool, M2TCPConnectionManager m2TcpConnectionManager)
+        public M2TCPConnection(IConnectionPool connectionPool)
         {
-            this.connectionId = connectionId;
-            this.m2TcpConnectionManager = m2TcpConnectionManager;
             seed = DateTime.Now.GetHashCode() / 100;
             queue = new MediaQueue();
             connection = connectionPool.CreateConnection(queue);
@@ -80,10 +76,9 @@ namespace LiveStream
             return workChunk;
         }
 
-        public void Dispose()
+        public void Close()
         {
-            m2TcpConnectionManager.CloseConnection(connectionId);
-            connection.Dispose();
+            connection.Close();
         }
     }
 }

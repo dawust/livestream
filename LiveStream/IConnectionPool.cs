@@ -2,6 +2,6 @@ namespace LiveStream
 {
     public interface IConnectionPool
     {
-        IConnection CreateConnection(MediaQueue queue);
+        Connection CreateConnection(MediaQueue queue);
     }
 }

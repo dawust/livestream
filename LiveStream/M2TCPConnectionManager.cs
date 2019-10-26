@@ -21,7 +21,7 @@ namespace LiveStream
                 if (!m2TcpConnections.ContainsKey(connectionId))
                 {
                     m2TcpConnectionCounter[connectionId] = 0;
-                    m2TcpConnections[connectionId] = new M2TCPConnection(connectionId, connectionPool, this);
+                    m2TcpConnections[connectionId] = new M2TCPConnection(connectionPool);
                 }
 
                 m2TcpConnectionCounter[connectionId] = m2TcpConnectionCounter[connectionId] + 1; 
@@ -42,7 +42,7 @@ namespace LiveStream
                 
                 if (m2TcpConnectionCounter[connectionId] <= 0)
                 {
-                    m2TcpConnections.Remove(connectionId);
+                    m2TcpConnections[connectionId].Close();
                 }
             }
         }
