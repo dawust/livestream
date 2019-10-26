@@ -1,6 +1,8 @@
+using System;
+
 namespace LiveStream
 {
-    public class Connection
+    public class Connection : IConnection
     {
         private readonly ConnectionPool connectionPool;
         
@@ -14,7 +16,7 @@ namespace LiveStream
             this.connectionPool = connectionPool;
         }
 
-        public void Close()
+        public void Dispose()
         {
             IsAlive = false;
             connectionPool.CloseDeadConnections();

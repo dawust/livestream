@@ -8,7 +8,7 @@ namespace LiveStream
         private readonly List<Connection> connections = new List<Connection>();
         private List<Connection> connectionsClone = new List<Connection>();
 
-        public Connection CreateConnection(MediaQueue mediaQueue)
+        public IConnection CreateConnection(MediaQueue mediaQueue)
         {            
             var connection = new Connection(mediaQueue, this);
             

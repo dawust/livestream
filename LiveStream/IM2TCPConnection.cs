@@ -1,6 +1,8 @@
+using System;
+
 namespace LiveStream
 {
-    public interface IM2TCPConnection
+    public interface IM2TCPConnection : IDisposable
     {
         WorkChunk GetNextWorkChunk();
 
