@@ -9,7 +9,7 @@ namespace LiveStream
 {
     public class MTCPSource : ISource
     {
-        private readonly IDictionary<Tuple<int, int>, MTCPChunk> chunks = new Dictionary<Tuple<int, int>, MTCPChunk>();
+        private readonly IDictionary<Tuple<int, int>, IChunk> chunks = new Dictionary<Tuple<int, int>, IChunk>();
         private readonly int port;
 
         private MediaQueue queue;
@@ -61,7 +61,7 @@ namespace LiveStream
                     var buffer = new byte[length];
                     networkStream.ReadExactly(buffer, length);
 
-                    var chunk = new MTCPChunk(buffer, length, seed);
+                    var chunk = new Chunk(buffer, length);
 
                     lock (chunks)
                     {
@@ -103,22 +103,6 @@ namespace LiveStream
             {
                 Logger.Warning<MTCPSource>($"Connection closed: {e.Message}");
             }
-        }
-
-        private class MTCPChunk : IChunk
-        {
-            public MTCPChunk(byte[] buffer, int length, int seed)
-            {
-                Buffer = buffer;
-                Length = length;
-                Seed = seed;
-            }
-
-            public byte[] Buffer { get; }
-            
-            public int Length { get; }
-            
-            public int Seed { get; }
         }
     }
 }

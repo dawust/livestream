@@ -2,7 +2,7 @@ using System;
 
 namespace LiveStream
 {
-    public class Logger
+    public static class Logger
     {
         public static void Info<T>(string text)
         {

@@ -1,23 +1,24 @@
+using System;
+
 namespace LiveStream
 {
-    public class Connection
+    public class Connection : IConnection
     {
-        private readonly ConnectionPool connectionPool;
-        
+        private readonly Action destructorAction;
         public bool IsAlive { get; private set; }
         public MediaQueue MediaQueue { get; }
         
-        public Connection(MediaQueue mediaQueue, ConnectionPool connectionPool)
+        public Connection(MediaQueue mediaQueue, Action destructorAction)
         {
             MediaQueue = mediaQueue;
             IsAlive = true;
-            this.connectionPool = connectionPool;
+            this.destructorAction = destructorAction;
         }
 
-        public void Close()
+        public void Dispose()
         {
             IsAlive = false;
-            connectionPool.CloseDeadConnections();
+            destructorAction();
         }
     }
 }

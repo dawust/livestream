@@ -5,11 +5,11 @@ namespace LiveStream
 {
     public class ConsoleWriterSink : ISink
     {
-        private MediaQueue queue = new MediaQueue();
+        private IConnection connection;
         
         public void StartSink(IConnectionPool connectionPool)
         {
-            connectionPool.CreateConnection(queue);
+            connection = connectionPool.CreateConnection();
             
             new Thread(WriteLoop).Start();
         }
@@ -20,7 +20,7 @@ namespace LiveStream
             
             while (true)
             {
-                var chunk = queue.ReadBlocking();
+                var chunk = connection.MediaQueue.ReadBlocking();
                 console.Write(chunk.Buffer, 0, chunk.Length);
             }
         }

@@ -20,8 +20,9 @@ namespace LiveStream
             {
                 if (!m2TcpConnections.ContainsKey(connectionId))
                 {
+                    var connection = connectionPool.CreateConnection();
                     m2TcpConnectionCounter[connectionId] = 0;
-                    m2TcpConnections[connectionId] = new M2TCPConnection(connectionId, connectionPool);
+                    m2TcpConnections[connectionId] = new M2TCPConnection(connection, () => CloseConnection(connectionId));
                 }
 
                 m2TcpConnectionCounter[connectionId] = m2TcpConnectionCounter[connectionId] + 1; 
@@ -29,15 +30,8 @@ namespace LiveStream
             }
         }
 
-        public void CloseConnection(IM2TCPConnection connection)
+        private void CloseConnection(int connectionId)
         {
-            if (connection == null)
-            {
-                return;
-            }
-            
-            var connectionId = connection.ConnectionId;
-            
             lock (m2TcpConnections)
             {
                 m2TcpConnectionCounter[connectionId] = m2TcpConnectionCounter[connectionId] - 1;
@@ -49,7 +43,7 @@ namespace LiveStream
                 
                 if (m2TcpConnectionCounter[connectionId] <= 0)
                 {
-                    m2TcpConnections[connectionId].Close();
+                    m2TcpConnections[connectionId].Connection.Dispose();
                     m2TcpConnections.Remove(connectionId);
                 }
             }

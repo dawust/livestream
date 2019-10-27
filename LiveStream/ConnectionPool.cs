@@ -8,9 +8,10 @@ namespace LiveStream
         private readonly List<Connection> connections = new List<Connection>();
         private List<Connection> connectionsClone = new List<Connection>();
 
-        public Connection CreateConnection(MediaQueue mediaQueue)
+        public IConnection CreateConnection()
         {            
-            var connection = new Connection(mediaQueue, this);
+            var mediaQueue = new MediaQueue();
+            var connection = new Connection(mediaQueue, CloseDeadConnections);
             
             lock (connections)
             {
@@ -24,7 +25,7 @@ namespace LiveStream
             return connection;
         }
 
-        public void CloseDeadConnections()
+        private void CloseDeadConnections()
         {
             lock (connections)
             {

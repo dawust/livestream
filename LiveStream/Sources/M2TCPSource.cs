@@ -8,7 +8,7 @@ namespace LiveStream
 {
     public class M2TCPSource : ISource
     {
-        private readonly IDictionary<Tuple<int, int>, M2TCPChunk> chunks = new Dictionary<Tuple<int, int>, M2TCPChunk>();
+        private readonly IDictionary<Tuple<int, int>, IChunk> chunks = new Dictionary<Tuple<int, int>, IChunk>();
         private readonly MediaQueue queue = new MediaQueue();
 
         private readonly string hostname;
@@ -66,7 +66,7 @@ namespace LiveStream
                         var buffer = new byte[length];
                         networkStream.ReadExactly(buffer, length);
 
-                        var chunk = new M2TCPChunk(buffer, length, seed);
+                        var chunk = new Chunk(buffer, length);
 
                         lock (chunks)
                         {
@@ -110,22 +110,6 @@ namespace LiveStream
                 }
                 Thread.Sleep(1000);
             }
-        }
-
-        private class M2TCPChunk : IChunk
-        {
-            public M2TCPChunk(byte[] buffer, int length, int seed)
-            {
-                Buffer = buffer;
-                Length = length;
-                Seed = seed;
-            }
-
-            public byte[] Buffer { get; }
-
-            public int Length { get; }
-
-            public int Seed { get; }
         }
     }
 }

@@ -2,7 +2,7 @@ using System;
 
 namespace LiveStream
 {
-    public class WorkChunk
+    public class WorkChunk : IChunk
     {
         public WorkChunk(byte[] buffer, int length, int fileId, int seed, bool processed, DateTime retryAt)
         {

@@ -41,8 +41,6 @@ namespace LiveStream
             tcpClient.SendBufferSize = 64 * 1024;
             tcpClient.ReceiveBufferSize = 64 * 1024;
 
-            IM2TCPConnection m2TcpConnection = null;
-
             try
             {
                 var stream = tcpClient.GetStream();
@@ -56,27 +54,27 @@ namespace LiveStream
                 }
                 
                 Logger.Info<M2TCPSink>($"Accept connection {tcpClient.Client.RemoteEndPoint} with connection id {connectionId}");
-                
-                m2TcpConnection = m2TcpConnectionManager.GetConnection(connectionId);
 
-                while (true)
+                using (var m2TcpConnection = m2TcpConnectionManager.GetConnection(connectionId))
                 {
-                    var workChunk = m2TcpConnection.GetNextWorkChunk();
-                    
-                    var startTime = DateTime.Now;
-                    stream.SendWorkChunk(workChunk);
-                    m2TcpConnection.FinishWorkChunk(workChunk);
-                    
-                    if (workChunk.FileId % 50 == 0)
+                    while (true)
                     {
-                        var processingTime = (DateTime.Now - startTime).Milliseconds;
-                        Logger.Info<M2TCPSink>($"Sent {workChunk.Length} Bytes; Block {workChunk.FileId}; Receiver Queue {m2TcpConnection.SourceCount}; Work Queue {m2TcpConnection.WorkCount}; Time {processingTime}");
+                        var workChunk = m2TcpConnection.GetNextWorkChunk();
+                    
+                        var startTime = DateTime.Now;
+                        stream.SendWorkChunk(workChunk);
+                        m2TcpConnection.FinishWorkChunk(workChunk);
+                    
+                        if (workChunk.FileId % 50 == 0)
+                        {
+                            var processingTime = (DateTime.Now - startTime).Milliseconds;
+                            Logger.Info<M2TCPSink>($"Sent {workChunk.Length} Bytes; Block {workChunk.FileId}; Receiver Queue {m2TcpConnection.SourceCount}; Work Queue {m2TcpConnection.WorkCount}; Time {processingTime}");
+                        }
                     }
                 }
             }
             catch (Exception e)
             {
-                m2TcpConnectionManager.CloseConnection(m2TcpConnection);
                 Logger.Info<M2TCPSink>($"Lost connection {tcpClient.Client.RemoteEndPoint}: {e.Message}");
             }
         }

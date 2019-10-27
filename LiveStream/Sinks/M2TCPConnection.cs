@@ -8,18 +8,17 @@ namespace LiveStream
     {
         private int fileId = 0;
 
-        private readonly int connectionId;
         private readonly int seed;
-        private readonly MediaQueue queue;
-        private readonly Connection connection;
+        private readonly IConnection connection;
+        private readonly Action destructorAction;
         private readonly List<WorkChunk> workItems = new List<WorkChunk>();
 
-        public M2TCPConnection(int connectionId, IConnectionPool connectionPool)
+        public M2TCPConnection(IConnection connection, Action destructorAction)
         {
-            this.connectionId = connectionId;
+            this.connection = connection;
+            this.destructorAction = destructorAction;
+            
             seed = DateTime.Now.GetHashCode() / 100;
-            queue = new MediaQueue();
-            connection = connectionPool.CreateConnection(queue);
         }
         
         public WorkChunk GetNextWorkChunk()
@@ -28,7 +27,7 @@ namespace LiveStream
             
             if (workChunk == null)
             {
-                var receiverChunk = queue.ReadBlocking();
+                var receiverChunk = connection.MediaQueue.ReadBlocking();
                 lock (workItems)
                 {
                     workChunk = new WorkChunk(
@@ -47,23 +46,7 @@ namespace LiveStream
 
             return workChunk;
         }
-
-        public void FinishWorkChunk(WorkChunk workChunk)
-        {
-            lock (workItems)
-            {
-                workChunk.Processed = true;
-            }
-        }
-
-        public int SourceCount => queue.Count;
         
-        public int WorkCount => workItems.Count;
-        
-        public int ConnectionId => connectionId;
-
-        public void Close() => connection.Close();
-
         private WorkChunk GetWorkChunkToRetryOrNull()
         {
             WorkChunk workChunk;
@@ -81,5 +64,21 @@ namespace LiveStream
             workChunk.RetryAt = DateTime.Now.AddMilliseconds(500);
             return workChunk;
         }
+
+        public void FinishWorkChunk(WorkChunk workChunk)
+        {
+            lock (workItems)
+            {
+                workChunk.Processed = true;
+            }
+        }
+
+        public int SourceCount => connection.MediaQueue.Count;
+        
+        public int WorkCount => workItems.Count;
+
+        public IConnection Connection => connection;
+        
+        public void Dispose() => destructorAction();
     }
 }

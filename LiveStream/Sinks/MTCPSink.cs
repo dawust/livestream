@@ -10,14 +10,14 @@ namespace LiveStream
     {
         private int fileId;
         private int seed;
-
+        private IConnection connection;
+        
         private readonly int uploadThreads;
         private readonly bool[] threadConnectionStatus;
         private readonly string destination;
         private readonly int destinationPort;
-        private readonly MediaQueue queue = new MediaQueue();
         private readonly List<WorkChunk> workItems = new List<WorkChunk>();
-
+        
         public MTCPSink(int uploadThreads, string destination, int destinationPort)
         {
             this.uploadThreads = uploadThreads;
@@ -30,7 +30,7 @@ namespace LiveStream
 
         public void StartSink(IConnectionPool connectionPool)
         {
-            connectionPool.CreateConnection(queue);
+            connection = connectionPool.CreateConnection();
             
             for (var tid = 0; tid < uploadThreads; tid++)
             {
@@ -73,7 +73,7 @@ namespace LiveStream
                     if (workChunk.FileId % 50 == 0)
                     {
                         var processingTime = (DateTime.Now - startTime).Milliseconds;
-                        Logger.Info<MTCPSink>($"Sent {workChunk.Length} Bytes; Block {workChunk.FileId}; Receiver Queue {queue.Count}; Work Queue {workItems.Count}; Time {processingTime}");
+                        Logger.Info<MTCPSink>($"Sent {workChunk.Length} Bytes; Block {workChunk.FileId}; Receiver Queue {connection.MediaQueue.Count}; Work Queue {workItems.Count}; Time {processingTime}");
                     }
                 }
                 catch (Exception e)
@@ -114,7 +114,7 @@ namespace LiveStream
             
             if (workChunk == null)
             {
-                var receiverChunk = queue.ReadBlocking();
+                var receiverChunk = connection.MediaQueue.ReadBlocking();
                 lock (workItems)
                 {
                     workChunk = new WorkChunk(
