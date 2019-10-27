@@ -77,11 +77,14 @@ namespace LiveStream
 
         public void Reset()
         {
-            lock (workItems)
+            lock (connection.MediaQueue)
             {
-                workItems.Clear();
-                fileId = 0;
-                seed = DateTime.Now.GetHashCode() / 100;
+                lock (workItems)
+                {
+                    workItems.Clear();
+                    fileId = 0;
+                    seed = DateTime.Now.GetHashCode() / 100;
+                }
             }
         }
         
