@@ -14,15 +14,7 @@ namespace LiveStream
                 return new ConsoleWriterSink();
             }
 
-            if (cmdArgs.IsSinkM2Tcp)
-            {
-                return new M2TCPSink(cmdArgs.SinkM2TcpPort);
-            }
-
-            return new MTCPSink(
-                uploadThreads: cmdArgs.SinkMtcpUploaders,
-                destination: cmdArgs.SinkMtcpIp, 
-                destinationPort: cmdArgs.SinkMtcpPort);
+            return new M2TCPSink(cmdArgs.SinkM2TcpPort);
         }
     }
 }

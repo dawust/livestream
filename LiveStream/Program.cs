@@ -12,23 +12,16 @@ namespace LiveStream
 
             var cmdArgs = new CmdArgs
             {
+                SinkM2TcpPort = 13999,
                 UdpPort = 1236, 
-                SinkMtcpIp = "127.0.0.1", 
-                SinkMtcpUploaders = 16, 
-                SinkMtcpPort = 9345,
                 M2TcpConnections = 16
             };
 
             var optionSet = new OptionSet()
             {
-                {"mtcp", v => cmdArgs.IsSourceMtcp = v != null},
                 {"http", v => cmdArgs.IsSourceHttp = v != null},
                 {"port=", (int v) => cmdArgs.UdpPort = v},
                 {"url=", v => cmdArgs.HttpUri = v},
-                {"conn=", (int v) => cmdArgs.SinkMtcpUploaders = v},
-                {"dest=", v => cmdArgs.SinkMtcpIp = v},
-                {"dport=", (int v) => cmdArgs.SinkMtcpPort = v},
-                {"mtcpport=", (int v) => cmdArgs.MtcpPort = v},
                 {"sinkhttp", v => cmdArgs.IsSinkHttp = v != null},
                 {"sinkhttpport=", (int v) => cmdArgs.SinkHttpPort = v},
                 {"sinkconsole", v => cmdArgs.IsSinkConsole = v != null},
@@ -72,16 +65,13 @@ namespace LiveStream
 
         private static void DisplayHelp(CmdArgs cmdArgs)
         {
-            Console.WriteLine("Streaming Magic TCP 0.44");
+            Console.WriteLine("Streaming Magic TCP 0.5");
             Console.WriteLine("Sources");
             Console.WriteLine("--udp          | UDP Source (default) : ");
             Console.WriteLine("--port         | UDP Port             : " + cmdArgs.UdpPort);
             Console.WriteLine("");
             Console.WriteLine("--http         | HTTP Source          : " + cmdArgs.IsSourceHttp);
             Console.WriteLine("--url          | HTTP URL             : " + cmdArgs.HttpUri);
-            Console.WriteLine("");
-            Console.WriteLine("--mtcp         | MTCP Source          : " + cmdArgs.IsSourceMtcp);
-            Console.WriteLine("--mtcpport     | MTCP Port            : " + cmdArgs.MtcpPort);
             Console.WriteLine("");
             Console.WriteLine("--m2tcp        | M2TCP Source         : " + cmdArgs.IsSourceM2tcp);
             Console.WriteLine("--m2tcphost    | M2TCP Host           : " + cmdArgs.M2TcpHost);
@@ -90,17 +80,12 @@ namespace LiveStream
             Console.WriteLine("");
             Console.WriteLine("");
             Console.WriteLine("Sinks");
-            Console.WriteLine("--sinkmtcp     | MTCP Sink (default)  : ");
-            Console.WriteLine("--conn         | Max Connections      : " + cmdArgs.SinkMtcpUploaders);
-            Console.WriteLine("--dest         | Destination          : " + cmdArgs.SinkMtcpIp);
-            Console.WriteLine("--dport        | Destination Port     : " + cmdArgs.SinkMtcpPort);
-            Console.WriteLine("");
             Console.WriteLine("--sinkhttp     | HTTP Sink            : " + cmdArgs.IsSinkHttp);
             Console.WriteLine("--sinkhttpport | HTTP Port            : " + cmdArgs.SinkHttpPort);
             Console.WriteLine("");
             Console.WriteLine("--sinkconsole  | Output to console    : " + cmdArgs.IsSinkConsole);
             Console.WriteLine("");
-            Console.WriteLine("--sinkm2tcp    | M2TCP Sink           : " + cmdArgs.IsSinkM2Tcp);
+            Console.WriteLine("--sinkm2tcp    | M2TCP Sink (default) : " + cmdArgs.IsSinkM2Tcp);
             Console.WriteLine("--sinkm2tcpport| M2TCP Port           : " + cmdArgs.SinkM2TcpPort);
             Console.WriteLine(new string('=', 80));
         }

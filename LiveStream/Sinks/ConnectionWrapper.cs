@@ -7,8 +7,7 @@ namespace LiveStream
     public class ConnectionWrapper
     {
         private int fileId = 0;
-        private int seed = 0;
-        
+        private readonly int seed = 0;
         private readonly IConnection connection;
         private readonly List<WorkChunk> workItems = new List<WorkChunk>();
 
@@ -31,7 +30,7 @@ namespace LiveStream
                     chunkFileId = fileId;
                     fileId++;
                 });
-                
+
                 workChunk = new WorkChunk(
                     buffer: receiverChunk.Buffer, 
                     length: receiverChunk.Length, 
@@ -72,19 +71,6 @@ namespace LiveStream
             lock (workItems)
             {
                 workChunk.Processed = true;
-            }
-        }
-
-        public void Reset()
-        {
-            lock (connection.MediaQueue)
-            {
-                lock (workItems)
-                {
-                    workItems.Clear();
-                    fileId = 0;
-                    seed = DateTime.Now.GetHashCode() / 100;
-                }
             }
         }
         
