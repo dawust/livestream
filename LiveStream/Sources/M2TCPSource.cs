@@ -50,6 +50,7 @@ namespace LiveStream
                     tcpClient.SendBufferSize = 64 * 1024;
                     tcpClient.ReceiveBufferSize = 64 * 1024;
                     var networkStream = tcpClient.GetStream();
+                    networkStream.ReadTimeout = 10000;
 
                     var lastCheckedId = 0;
                     var lastCheck = DateTime.Now;

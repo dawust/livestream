@@ -36,7 +36,13 @@ namespace LiveStream
             var receivedLength = 0;
             while (receivedLength < size)
             {
-                receivedLength += networkStream.Read(buffer, receivedLength, size - receivedLength);
+                var length = networkStream.Read(buffer, receivedLength, size - receivedLength);
+                if (length == 0)
+                {
+                    return receivedLength;
+                }
+                
+                receivedLength += length;
             }
 
             return receivedLength;
