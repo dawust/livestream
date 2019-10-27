@@ -1,6 +1,6 @@
 namespace LiveStream
 {
-    public interface IConnectionPool
+    public interface IConnectionManager
     {
         IConnection CreateConnection();
     }

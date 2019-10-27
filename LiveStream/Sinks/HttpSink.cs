@@ -9,16 +9,16 @@ namespace LiveStream
     public class HttpSink : ISink
     {
         private TcpListener listener;
-        private IConnectionPool connectionPool;
+        private IConnectionManager connectionManager;
 
         public HttpSink(int port)
         {
             listener = new TcpListener(IPAddress.Any, port);
         }
 
-        public void StartSink(IConnectionPool connectionPool)
+        public void StartSink(IConnectionManager connectionManager)
         {
-            this.connectionPool = connectionPool;
+            this.connectionManager = connectionManager;
             new Thread(ReceiveLoop).Start();
         }
 
@@ -42,7 +42,7 @@ namespace LiveStream
 
             try
             {
-                using (var connection = connectionPool.CreateConnection())
+                using (var connection = connectionManager.CreateConnection())
                 {
                     while (true)
                     {

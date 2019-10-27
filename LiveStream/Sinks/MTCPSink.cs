@@ -22,9 +22,9 @@ namespace LiveStream
             this.destinationPort = destinationPort;
         }
 
-        public void StartSink(IConnectionPool connectionPool)
+        public void StartSink(IConnectionManager connectionManager)
         {
-            var connection = connectionPool.CreateConnection();
+            var connection = connectionManager.CreateConnection();
             connectionWrapper = new ConnectionWrapper(connection);
 
             for (var tid = 0; tid < uploadThreads; tid++)

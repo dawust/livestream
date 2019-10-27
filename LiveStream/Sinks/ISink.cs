@@ -2,6 +2,6 @@ namespace LiveStream
 {
     public interface ISink
     {
-        void StartSink(IConnectionPool connectionPool);
+        void StartSink(IConnectionManager connectionManager);
     }
 }

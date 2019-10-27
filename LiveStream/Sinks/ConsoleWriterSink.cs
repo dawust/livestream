@@ -7,9 +7,9 @@ namespace LiveStream
     {
         private IConnection connection;
         
-        public void StartSink(IConnectionPool connectionPool)
+        public void StartSink(IConnectionManager connectionManager)
         {
-            connection = connectionPool.CreateConnection();
+            connection = connectionManager.CreateConnection();
             
             new Thread(WriteLoop).Start();
         }

@@ -17,9 +17,9 @@ namespace LiveStream
             listener = new TcpListener(IPAddress.Any, port);
         }
 
-        public void StartSink(IConnectionPool connectionPool)
+        public void StartSink(IConnectionManager connectionManager)
         {
-            m2TcpConnectionManager = new M2TCPConnectionManager(connectionPool);
+            m2TcpConnectionManager = new M2TCPConnectionManager(connectionManager);
             new Thread(ReceiveLoop).Start();
         }
 

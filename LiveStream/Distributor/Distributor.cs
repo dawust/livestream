@@ -4,13 +4,13 @@ namespace LiveStream
 {
     public class Distributor
     {
-        public void DistributionLoop(MediaQueue source, ConnectionPool connectionPool)
+        public void DistributionLoop(MediaQueue source, ConnectionManager connectionManager)
         {
             while (true)
             {
                 var chunk = source.ReadBlocking();
                 
-                foreach (var connection in connectionPool.GetConnections())
+                foreach (var connection in connectionManager.GetConnections())
                 {
                     try
                     {

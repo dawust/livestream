@@ -58,16 +58,16 @@ namespace LiveStream
             
             Thread.CurrentThread.Priority = ThreadPriority.Highest;
 
-            var connectionPool = new ConnectionPool();
+            var connectionManager = new ConnectionManager();
             
             var sink = new SinkFactory().CreateSink(cmdArgs);
-            sink.StartSink(connectionPool);
+            sink.StartSink(connectionManager);
             
             var source = new SourceFactory().CreateSource(cmdArgs);
             var queue = source.StartSource();
             
             var distributor = new Distributor();
-            distributor.DistributionLoop(queue, connectionPool);            
+            distributor.DistributionLoop(queue, connectionManager);            
         }
 
         private static void DisplayHelp(CmdArgs cmdArgs)
