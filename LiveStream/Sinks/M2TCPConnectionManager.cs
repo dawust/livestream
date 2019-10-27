@@ -38,7 +38,7 @@ namespace LiveStream
                 var m2TcpConnection = m2TcpConnections[connectionId];
                 m2TcpConnection.RemoveReference();
                 
-                if (!m2TcpConnection.HasReferences())
+                if (m2TcpConnection.HasNoReferences())
                 {
                     m2TcpConnections[connectionId].Connection.Dispose();
                     m2TcpConnections.Remove(connectionId);
@@ -64,7 +64,7 @@ namespace LiveStream
         
             public WorkChunk GetNextWorkChunk() => connectionWrapper.GetNextWorkChunk();
 
-            public void FinishWorkChunk(WorkChunk workChunk) => connectionWrapper.FinishWorkChunk(workChunk);
+            public void FinishWorkChunks(int lastId) => connectionWrapper.FinishWorkChunks(lastId);
 
             public int SourceCount => connectionWrapper.SourceCount;
         
@@ -78,7 +78,7 @@ namespace LiveStream
 
             public void RemoveReference() => references--;
 
-            public bool HasReferences()
+            public bool HasNoReferences()
             {
                 if (references < 0)
                 {

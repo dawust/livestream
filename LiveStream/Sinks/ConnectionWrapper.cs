@@ -66,11 +66,14 @@ namespace LiveStream
             return workChunk;
         }
 
-        public void FinishWorkChunk(WorkChunk workChunk)
+        public void FinishWorkChunks(int lastId)
         {
             lock (workItems)
             {
-                workChunk.Processed = true;
+                foreach (var workChunk in workItems.Where(wi => wi.FileId < lastId).ToList())
+                {
+                    workChunk.Processed = true;
+                }
             }
         }
         

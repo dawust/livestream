@@ -77,16 +77,18 @@ namespace LiveStream
                                 Logger.Info<M2TCPSource>($"Got new seed {seed}");
                                 currentSeed = seed;
                                 lastId = 0;
-                                foreach (var chunkId in chunks.Select(c => c.Key).Where(kvp => kvp.Item2 != currentSeed).ToList())
+                                foreach (var chunkId in chunks.Select(c => c.Key)
+                                    .Where(kvp => kvp.Item2 != currentSeed).ToList())
                                 {
                                     chunks.Remove(chunkId);
                                 }
                             }
-                            
+
                             while (chunks.ContainsKey(Tuple.Create(lastId, currentSeed)))
                             {
                                 var nextChunk = chunks[Tuple.Create(lastId, currentSeed)];
-                                foreach (var chunkId in chunks.Select(c => c.Key).Where(kvp => kvp.Item1 < lastId && kvp.Item2 == currentSeed).ToList())
+                                foreach (var chunkId in chunks.Select(c => c.Key)
+                                    .Where(kvp => kvp.Item1 < lastId && kvp.Item2 == currentSeed).ToList())
                                 {
                                     chunks.Remove(chunkId);
                                 }
@@ -103,12 +105,15 @@ namespace LiveStream
                                 lastCheck = DateTime.Now;
                             }
                         }
+
+                        networkStream.SendInt32(lastCheckedId - 1);
                     }
                 }
                 catch (Exception e)
                 {
                     Logger.Warning<M2TCPSource>($"Connection closed: {e.Message}");
                 }
+
                 Thread.Sleep(1000);
             }
         }

@@ -6,7 +6,7 @@ namespace LiveStream
     {
         WorkChunk GetNextWorkChunk();
 
-        void FinishWorkChunk(WorkChunk workChunk);
+        void FinishWorkChunks(int lastId);
 
         int SourceCount { get; }
         

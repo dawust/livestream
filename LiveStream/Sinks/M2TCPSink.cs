@@ -2,6 +2,7 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace LiveStream
 {
@@ -54,7 +55,7 @@ namespace LiveStream
                 }
                 
                 Logger.Info<M2TCPSink>($"Accept connection {tcpClient.Client.RemoteEndPoint} with connection id {connectionId}");
-
+                
                 using (var m2TcpConnection = m2TcpConnectionManager.GetOrCreateConnection(connectionId))
                 {
                     while (true)
@@ -63,7 +64,9 @@ namespace LiveStream
                     
                         var startTime = DateTime.Now;
                         stream.SendWorkChunk(workChunk);
-                        m2TcpConnection.FinishWorkChunk(workChunk);
+
+                        var lastId = stream.ReadInt32();
+                        m2TcpConnection.FinishWorkChunks(lastId);
                     
                         if (workChunk.FileId % 50 == 0)
                         {
@@ -76,6 +79,22 @@ namespace LiveStream
             catch (Exception e)
             {
                 Logger.Info<M2TCPSink>($"Lost connection {tcpClient.Client.RemoteEndPoint}: {e.Message}");
+            }
+        }
+
+        private async Task HandleProcessedChunks(IM2TCPConnection m2TcpConnection, NetworkStream networkStream)
+        {
+            try
+            {
+                while (true)
+                {
+                    var lastId = await networkStream.ReadInt32Async();
+                    m2TcpConnection.FinishWorkChunks(lastId);
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Error<M2TCPSink>($"Error in processing chunks: {e.Message}");
             }
         }
     }

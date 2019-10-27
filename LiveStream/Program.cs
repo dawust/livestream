@@ -14,7 +14,7 @@ namespace LiveStream
             {
                 SinkM2TcpPort = 13999,
                 UdpPort = 1236, 
-                M2TcpConnections = 16
+                M2TcpConnections = 30
             };
 
             var optionSet = new OptionSet()
