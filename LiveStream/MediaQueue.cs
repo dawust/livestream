@@ -1,3 +1,5 @@
+using System;
+
 namespace LiveStream
 {
     public class MediaQueue
@@ -12,6 +14,11 @@ namespace LiveStream
         public IChunk ReadBlocking()
         {
             return queue.Dequeue();
+        }
+        
+        public IChunk ReadBlocking(Action lockedAction)
+        {
+            return queue.Dequeue(lockedAction);
         }
 
         public void Clear()

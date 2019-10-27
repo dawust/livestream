@@ -1,10 +1,12 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Threading;
 
 namespace LiveStream
 {
     class HttpSource : ISource
     {
+        private const int ReceiveSize = 16384;
         private readonly string httpUri;
         private readonly MediaQueue queue = new MediaQueue();
         
@@ -22,18 +24,34 @@ namespace LiveStream
 
         private void ReceiveLoop()
         {
-            Logger.Info<HttpSource>($"Read from {httpUri}");
-            
-            var request = (HttpWebRequest) WebRequest.Create(httpUri);
-            var responseStream = ((HttpWebResponse) request.GetResponse()).GetResponseStream();
             while (true)
             {
-                var buffer = new byte[16384];
-                var count = responseStream.Read(buffer, 0, buffer.Length);
+                try
+                {
+                    Logger.Info<HttpSource>($"Read from {httpUri}");
 
-                var writer = new Chunk(buffer, count);
+                    var request = (HttpWebRequest) WebRequest.Create(httpUri);
+                    var responseStream = ((HttpWebResponse) request.GetResponse()).GetResponseStream();
+                    while (true)
+                    {
+                        var buffer = new byte[ReceiveSize * 4];
 
-                queue.Write(writer);
+                        var receivedLength = 0;
+                        while (receivedLength < ReceiveSize * 2)
+                        {
+                            receivedLength += responseStream.Read(buffer, receivedLength, ReceiveSize);
+                        }
+
+                        var writer = new Chunk(buffer, receivedLength);
+
+                        queue.Write(writer);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.Error<HttpSource>($"Lost connection to {httpUri}: {e.Message}");
+                    Thread.Sleep(2000);
+                }
             }
         }
     }

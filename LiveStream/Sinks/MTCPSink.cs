@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
@@ -8,15 +7,12 @@ namespace LiveStream
 {
     public class MTCPSink : ISink
     {
-        private int fileId;
-        private int seed;
-        private IConnection connection;
-        
         private readonly int uploadThreads;
         private readonly bool[] threadConnectionStatus;
         private readonly string destination;
         private readonly int destinationPort;
-        private readonly List<WorkChunk> workItems = new List<WorkChunk>();
+
+        private ConnectionWrapper connectionWrapper;
         
         public MTCPSink(int uploadThreads, string destination, int destinationPort)
         {
@@ -24,14 +20,13 @@ namespace LiveStream
             this.threadConnectionStatus = new bool[uploadThreads];
             this.destination = destination;
             this.destinationPort = destinationPort;
-
-            Reset();
         }
 
         public void StartSink(IConnectionPool connectionPool)
         {
-            connection = connectionPool.CreateConnection();
-            
+            var connection = connectionPool.CreateConnection();
+            connectionWrapper = new ConnectionWrapper(connection);
+
             for (var tid = 0; tid < uploadThreads; tid++)
             {
                 var thread = new Thread(UploadThread);
@@ -46,7 +41,7 @@ namespace LiveStream
             Logger.Info<MTCPSink>("Thread started " + tid);
 
             TcpClient tcpClient = null;
-            NetworkStream netStream = null;
+            NetworkStream networkStream = null;
             while (true)
             {
                 try
@@ -56,30 +51,28 @@ namespace LiveStream
                         tcpClient = new TcpClient(destination, destinationPort);
                         tcpClient.SendBufferSize = 64 * 1024;
                         tcpClient.ReceiveBufferSize = 64 * 1024;
-                        netStream = tcpClient.GetStream();
+                        networkStream = tcpClient.GetStream();
                     }
                     SetThreadStatus(tcpClient.Connected, tid);
 
-                    var workChunk = GetNextWorkChunk();
+                    var workChunk = connectionWrapper.GetNextWorkChunk();
                     
                     var startTime = DateTime.Now;
 
-                    netStream.SendWorkChunk(workChunk);
-                    lock (workItems)
-                    {
-                        workChunk.Processed = true;
-                    }
+                    networkStream.SendWorkChunk(workChunk);
+                    connectionWrapper.FinishWorkChunk(workChunk);
 
                     if (workChunk.FileId % 50 == 0)
                     {
                         var processingTime = (DateTime.Now - startTime).Milliseconds;
-                        Logger.Info<MTCPSink>($"Sent {workChunk.Length} Bytes; Block {workChunk.FileId}; Receiver Queue {connection.MediaQueue.Count}; Work Queue {workItems.Count}; Time {processingTime}");
+                        Logger.Info<MTCPSink>($"Sent {workChunk.Length} Bytes; Block {workChunk.FileId}; Receiver Queue {connectionWrapper.SourceCount}; Work Queue {connectionWrapper.WorkCount}; Time {processingTime}");
                     }
                 }
                 catch (Exception e)
                 {
                     SetThreadStatus(false, tid);
                     Logger.Error<MTCPSink>(e.Message);
+                    Thread.Sleep(2000);
                 }
             }
         }
@@ -92,62 +85,9 @@ namespace LiveStream
 
                 if (threadConnectionStatus.All(tcs => tcs == false))
                 {
-                    Reset();
+                    Logger.Info<MTCPSink>("Reset uploader");
+                    connectionWrapper.Reset();
                 }
-            }
-        }
-
-        private void Reset()
-        {
-            Logger.Info<MTCPSink>("Reset uploader");
-            lock (workItems)
-            {
-                workItems.Clear();
-                fileId = 0;
-                seed = DateTime.Now.GetHashCode() / 100;
-            }
-        }
-
-        private WorkChunk GetNextWorkChunk()
-        {
-            var workChunk = GetWorkChunkToRetryOrNull();
-            
-            if (workChunk == null)
-            {
-                var receiverChunk = connection.MediaQueue.ReadBlocking();
-                lock (workItems)
-                {
-                    workChunk = new WorkChunk(
-                        buffer: receiverChunk.Buffer, 
-                        length: receiverChunk.Length, 
-                        fileId: fileId,
-                        seed: seed,
-                        processed: false,
-                        retryAt: DateTime.Now.AddSeconds(1));
-
-                    fileId++;
-                    
-                    workItems.Add(workChunk);
-                }
-            }
-
-            return workChunk;
-        }
-
-        private WorkChunk GetWorkChunkToRetryOrNull()
-        {
-            lock (workItems)
-            {
-                workItems.RemoveAll(wi => wi.Processed);
-                var workChunk = workItems.FirstOrDefault(wi => wi.RetryAt < DateTime.Now);
-
-                if (workChunk == null)
-                {
-                    return null;
-                }
-                
-                workChunk.RetryAt = DateTime.Now.AddMilliseconds(500);
-                return workChunk;
             }
         }
     }

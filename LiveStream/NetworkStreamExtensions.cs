@@ -5,17 +5,17 @@ namespace LiveStream
 {
     public static class NetworkStreamExtensions
     {
-        public static void SendWorkChunk(this NetworkStream netStream, WorkChunk chunk)
+        public static void SendWorkChunk(this NetworkStream networkStream, WorkChunk chunk)
         {
-            netStream.Write(BitConverter.GetBytes(Convert.ToUInt32(chunk.FileId)), 0, 4);
-            netStream.Write(BitConverter.GetBytes(Convert.ToUInt32(chunk.Length)), 0, 4);
-            netStream.Write(BitConverter.GetBytes(Convert.ToInt32(chunk.Seed)), 0, 4);
-            netStream.Write(chunk.Buffer, 0, chunk.Length);
+            networkStream.Write(BitConverter.GetBytes(Convert.ToUInt32(chunk.FileId)), 0, 4);
+            networkStream.Write(BitConverter.GetBytes(Convert.ToUInt32(chunk.Length)), 0, 4);
+            networkStream.Write(BitConverter.GetBytes(Convert.ToInt32(chunk.Seed)), 0, 4);
+            networkStream.Write(chunk.Buffer, 0, chunk.Length);
         }
         
-        public static void SendInt32(this NetworkStream netStream, int number)
+        public static void SendInt32(this NetworkStream networkStream, int number)
         {
-            netStream.Write(BitConverter.GetBytes(Convert.ToInt32(number)), 0, 4);
+            networkStream.Write(BitConverter.GetBytes(Convert.ToInt32(number)), 0, 4);
         }
         
         public static int ReadInt32(this NetworkStream networkStream)
