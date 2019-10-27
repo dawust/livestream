@@ -29,15 +29,58 @@ namespace LiveStream
 
         public MediaQueue StartSource()
         {
-            Logger.Info<M2TCPSource>("Start");
+            Logger.Info<M2TCPSource>($"Start {connections} connections");
             for (var tid = 0; tid < connections; tid++)
             {
                 var thread = new Thread(ReceiveThread);
                 thread.Priority = ThreadPriority.Lowest;
                 thread.Start(tid);
             }
+            
+            var controlThread = new Thread(ControlThread);
+            controlThread.Start();
 
             return queue;
+        }
+
+        private void ControlThread(object o)
+        {
+            while (true)
+            {
+                Logger.Info<M2TCPSource>("Start control thread");
+                try
+                {
+                    var tcpClient = new TcpClient(hostname, port);
+                    tcpClient.SendBufferSize = 256 * 1024;
+                    tcpClient.ReceiveBufferSize = 256 * 1024;
+                    tcpClient.NoDelay = true;
+                    var networkStream = tcpClient.GetStream();
+
+                    networkStream.SendInt32(M2TCPSink.ControlThreadMagicByte);
+                    networkStream.SendInt32(connectionId);
+
+                    while (true)
+                    {
+                        var lastCheckedId = 0;
+                        var lastSeed = 0;
+                        lock (chunks)
+                        {
+                            lastCheckedId = lastId;
+                            lastSeed = currentSeed;
+                        }
+                        
+                        networkStream.SendInt32(lastCheckedId);
+                        networkStream.SendInt32(lastSeed);
+                        Thread.Sleep(100);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.Warning<M2TCPSource>($"Control thread connection closed: {e.Message}");
+                }
+
+                Thread.Sleep(1000);
+            }
         }
 
         private void ReceiveThread(object o)
@@ -47,10 +90,9 @@ namespace LiveStream
                 try
                 {
                     var tcpClient = new TcpClient(hostname, port);
-                    tcpClient.SendBufferSize = 64 * 1024;
-                    tcpClient.ReceiveBufferSize = 64 * 1024;
+                    tcpClient.SendBufferSize = 256 * 1024;
+                    tcpClient.ReceiveBufferSize = 256 * 1024;
                     var networkStream = tcpClient.GetStream();
-                    networkStream.ReadTimeout = 10000;
 
                     var lastCheckedId = 0;
                     var lastCheck = DateTime.Now;
@@ -105,8 +147,6 @@ namespace LiveStream
                                 lastCheck = DateTime.Now;
                             }
                         }
-
-                        networkStream.SendInt32(lastCheckedId - 1);
                     }
                 }
                 catch (Exception e)

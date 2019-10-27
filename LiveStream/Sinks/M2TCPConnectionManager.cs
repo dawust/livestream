@@ -64,7 +64,7 @@ namespace LiveStream
         
             public WorkChunk GetNextWorkChunk() => connectionWrapper.GetNextWorkChunk();
 
-            public void FinishWorkChunks(int lastId) => connectionWrapper.FinishWorkChunks(lastId);
+            public void FinishWorkChunks(int lastId, int seed) => connectionWrapper.FinishWorkChunks(lastId, seed);
 
             public int SourceCount => connectionWrapper.SourceCount;
         
