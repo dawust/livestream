@@ -43,25 +43,8 @@ namespace LiveStream
                 }
             }
         }
-
-        public T Dequeue()
-        {
-            lock (queue)
-            {
-                while (queue.Count == 0)
-                {
-                    Monitor.Wait(queue);
-                }
-
-                var item = queue.First.Value;
-                queue.RemoveFirst();
-                Monitor.PulseAll(queue);
-
-                return item;
-            }
-        }
         
-        public T Dequeue(Action lockedAction)
+        public T Dequeue(Action lockedAction = null)
         {
             lock (queue)
             {
@@ -72,7 +55,10 @@ namespace LiveStream
 
                 var item = queue.First.Value;
                 queue.RemoveFirst();
-                lockedAction();
+                if (lockedAction != null)
+                {
+                    lockedAction();
+                }
                 
                 Monitor.PulseAll(queue);
 

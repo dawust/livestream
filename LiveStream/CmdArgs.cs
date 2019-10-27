@@ -3,10 +3,13 @@ namespace LiveStream
     public struct CmdArgs
     {
         public int UdpPort { get; set; }
+        
         public bool IsSourceHttp { get; set; }
 
         public string HttpUri { get; set; }
+        
         public bool IsSourceMtcp { get; set; }
+        
         public int MtcpPort { get; set; }
         
         public bool IsSourceM2tcp { get; set; }
@@ -18,7 +21,9 @@ namespace LiveStream
         public int M2TcpConnections { get; set; }
         
         public string SinkMtcpIp { get; set; }
+        
         public int SinkMtcpPort { get; set; }
+        
         public int SinkMtcpUploaders { get; set; }
 
         public bool IsSinkHttp { get; set; }

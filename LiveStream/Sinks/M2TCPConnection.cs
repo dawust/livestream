@@ -16,15 +16,9 @@ namespace LiveStream
             connectionWrapper = new ConnectionWrapper(connection);
         }
         
-        public WorkChunk GetNextWorkChunk()
-        {
-            return connectionWrapper.GetNextWorkChunk();
-        }
+        public WorkChunk GetNextWorkChunk() => connectionWrapper.GetNextWorkChunk();
 
-        public void FinishWorkChunk(WorkChunk workChunk)
-        {
-            connectionWrapper.FinishWorkChunk(workChunk);
-        }
+        public void FinishWorkChunk(WorkChunk workChunk) => connectionWrapper.FinishWorkChunk(workChunk);
 
         public int SourceCount => connectionWrapper.SourceCount;
         
