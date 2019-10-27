@@ -55,7 +55,7 @@ namespace LiveStream
                 
                 Logger.Info<M2TCPSink>($"Accept connection {tcpClient.Client.RemoteEndPoint} with connection id {connectionId}");
 
-                using (var m2TcpConnection = m2TcpConnectionManager.GetConnection(connectionId))
+                using (var m2TcpConnection = m2TcpConnectionManager.GetOrCreateConnection(connectionId))
                 {
                     while (true)
                     {

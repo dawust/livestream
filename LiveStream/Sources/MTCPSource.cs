@@ -9,8 +9,11 @@ namespace LiveStream
 {
     public class MTCPSource : ISource
     {
+        public const int MagicByte = 1337;
+        
         private readonly IDictionary<Tuple<int, int>, IChunk> chunks = new Dictionary<Tuple<int, int>, IChunk>();
         private readonly int port;
+        private readonly int sourceSeed;
 
         private MediaQueue queue;
         private int lastId = 0;
@@ -18,12 +21,14 @@ namespace LiveStream
 
         public MTCPSource(int port)
         {
+            sourceSeed = DateTime.Now.GetHashCode() / 100;
             this.port = port;
         }
 
         public MediaQueue StartSource()
         {
             queue = new MediaQueue();
+            
 
             new Thread(ReceiveLoop).Start();
 
@@ -52,6 +57,9 @@ namespace LiveStream
 
             try
             {
+                networkStream.SendInt32(MagicByte);
+                networkStream.SendInt32(sourceSeed);
+                
                 while (true)
                 {
                     var fileId = networkStream.ReadInt32();

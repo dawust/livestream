@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
 
@@ -7,17 +6,17 @@ namespace LiveStream
 {
     public class MTCPSink : ISink
     {
+        private readonly object lockObject = new object();
         private readonly int uploadThreads;
-        private readonly bool[] threadConnectionStatus;
         private readonly string destination;
         private readonly int destinationPort;
+        private int? sourceSeed;
 
         private ConnectionWrapper connectionWrapper;
         
         public MTCPSink(int uploadThreads, string destination, int destinationPort)
         {
             this.uploadThreads = uploadThreads;
-            this.threadConnectionStatus = new bool[uploadThreads];
             this.destination = destination;
             this.destinationPort = destinationPort;
         }
@@ -52,9 +51,30 @@ namespace LiveStream
                         tcpClient.SendBufferSize = 64 * 1024;
                         tcpClient.ReceiveBufferSize = 64 * 1024;
                         networkStream = tcpClient.GetStream();
-                    }
-                    SetThreadStatus(tcpClient.Connected, tid);
+                        
+                        var magicByte = networkStream.ReadInt32();
+                        var seed = networkStream.ReadInt32();
+                        
+                        if (magicByte != MTCPSource.MagicByte)
+                        {
+                            throw new Exception("Magic byte did not match");
+                        }
 
+                        lock (lockObject)
+                        {
+                            if (sourceSeed == null)
+                            {
+                                sourceSeed = seed;
+                            } 
+                            else if (sourceSeed != seed)
+                            {
+                                sourceSeed = seed;
+                                Logger.Info<MTCPSink>("Reset uploader");
+                                connectionWrapper.Reset();
+                            }
+                        }
+                    }
+                    
                     var workChunk = connectionWrapper.GetNextWorkChunk();
                     
                     var startTime = DateTime.Now;
@@ -70,23 +90,8 @@ namespace LiveStream
                 }
                 catch (Exception e)
                 {
-                    SetThreadStatus(false, tid);
                     Logger.Error<MTCPSink>(e.Message);
-                    Thread.Sleep(2000);
-                }
-            }
-        }
-
-        private void SetThreadStatus(bool status, int tid)
-        {
-            lock (threadConnectionStatus)
-            {
-                threadConnectionStatus[tid] = status;
-
-                if (threadConnectionStatus.All(tcs => tcs == false))
-                {
-                    Logger.Info<MTCPSink>("Reset uploader");
-                    connectionWrapper.Reset();
+                    Thread.Sleep(1000);
                 }
             }
         }

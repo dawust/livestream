@@ -14,7 +14,7 @@ namespace LiveStream
             this.connectionManager = connectionManager;
         }
         
-        public IM2TCPConnection GetConnection(int connectionId)
+        public IM2TCPConnection GetOrCreateConnection(int connectionId)
         {
             lock (m2TcpConnections)
             {
