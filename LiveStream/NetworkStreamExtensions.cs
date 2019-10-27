@@ -31,19 +31,6 @@ namespace LiveStream
             
             return BitConverter.ToInt32(buffer, 0);
         }
-        
-        public static async Task<int> ReadInt32Async(this NetworkStream networkStream)
-        {
-            var buffer = new byte[4];
-            var length = await networkStream.ReadExactlyAsync(buffer, 4);
-            
-            if (length != 4)
-            {
-                throw new Exception("Did not receive 4 bytes");
-            }
-            
-            return BitConverter.ToInt32(buffer, 0);
-        }
 
         public static int ReadExactly(this NetworkStream networkStream, byte[] buffer, int size)
         {
@@ -51,23 +38,6 @@ namespace LiveStream
             while (receivedLength < size)
             {
                 var length = networkStream.Read(buffer, receivedLength, size - receivedLength);
-                if (length == 0)
-                {
-                    throw new Exception("Socket was closed, returned 0 bytes");
-                }
-                
-                receivedLength += length;
-            }
-
-            return receivedLength;
-        }
-        
-        public static async Task<int> ReadExactlyAsync(this NetworkStream networkStream, byte[] buffer, int size)
-        {
-            var receivedLength = 0;
-            while (receivedLength < size)
-            {
-                var length = await networkStream.ReadAsync(buffer, receivedLength, size - receivedLength);
                 if (length == 0)
                 {
                     throw new Exception("Socket was closed, returned 0 bytes");

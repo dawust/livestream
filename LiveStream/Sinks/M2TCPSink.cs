@@ -39,8 +39,8 @@ namespace LiveStream
         private void Listen(object o)
         {
             var tcpClient = (TcpClient) o;
-            tcpClient.SendBufferSize = 64 * 1024;
-            tcpClient.ReceiveBufferSize = 64 * 1024;
+            tcpClient.SendBufferSize = 1024 * 1024;
+            tcpClient.ReceiveBufferSize = 1024 * 1024;
 
             try
             {
@@ -79,22 +79,6 @@ namespace LiveStream
             catch (Exception e)
             {
                 Logger.Info<M2TCPSink>($"Lost connection {tcpClient.Client.RemoteEndPoint}: {e.Message}");
-            }
-        }
-
-        private async Task HandleProcessedChunks(IM2TCPConnection m2TcpConnection, NetworkStream networkStream)
-        {
-            try
-            {
-                while (true)
-                {
-                    var lastId = await networkStream.ReadInt32Async();
-                    m2TcpConnection.FinishWorkChunks(lastId);
-                }
-            }
-            catch (Exception e)
-            {
-                Logger.Error<M2TCPSink>($"Error in processing chunks: {e.Message}");
             }
         }
     }
