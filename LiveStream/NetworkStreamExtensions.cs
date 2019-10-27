@@ -39,7 +39,7 @@ namespace LiveStream
                 var length = networkStream.Read(buffer, receivedLength, size - receivedLength);
                 if (length == 0)
                 {
-                    return receivedLength;
+                    throw new Exception("Socket was closed, returned 0 bytes");
                 }
                 
                 receivedLength += length;
