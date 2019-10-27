@@ -8,13 +8,15 @@ namespace LiveStream
     {
         private int fileId = 0;
 
+        private readonly int connectionId;
         private readonly int seed;
         private readonly MediaQueue queue;
         private readonly Connection connection;
         private readonly List<WorkChunk> workItems = new List<WorkChunk>();
 
-        public M2TCPConnection(IConnectionPool connectionPool)
+        public M2TCPConnection(int connectionId, IConnectionPool connectionPool)
         {
+            this.connectionId = connectionId;
             seed = DateTime.Now.GetHashCode() / 100;
             queue = new MediaQueue();
             connection = connectionPool.CreateConnection(queue);
@@ -57,6 +59,10 @@ namespace LiveStream
         public int SourceCount => queue.Count;
         
         public int WorkCount => workItems.Count;
+        
+        public int ConnectionId => connectionId;
+
+        public void Close() => connection.Close();
 
         private WorkChunk GetWorkChunkToRetryOrNull()
         {
@@ -74,11 +80,6 @@ namespace LiveStream
                 
             workChunk.RetryAt = DateTime.Now.AddMilliseconds(500);
             return workChunk;
-        }
-
-        public void Close()
-        {
-            connection.Close();
         }
     }
 }

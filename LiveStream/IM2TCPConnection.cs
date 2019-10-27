@@ -9,5 +9,7 @@ namespace LiveStream
         int SourceCount { get; }
         
         int WorkCount { get; }
+        
+        int ConnectionId { get; }
     }
 }

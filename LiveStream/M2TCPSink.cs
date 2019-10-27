@@ -41,15 +41,14 @@ namespace LiveStream
             tcpClient.SendBufferSize = 64 * 1024;
             tcpClient.ReceiveBufferSize = 64 * 1024;
 
-            IM2TCPConnection m2TcpConnection= null;
-            var connectionId = 0;
-            
+            IM2TCPConnection m2TcpConnection = null;
+
             try
             {
                 var stream = tcpClient.GetStream();
 
                 var magicByte = stream.ReadInt32();
-                connectionId = stream.ReadInt32();
+                var connectionId = stream.ReadInt32();
 
                 if (magicByte != MagicByte)
                 {
@@ -77,10 +76,7 @@ namespace LiveStream
             }
             catch (Exception e)
             {
-                if (m2TcpConnection != null)
-                {
-                    m2TcpConnectionManager.CloseConnection(connectionId);
-                }
+                m2TcpConnectionManager.CloseConnection(m2TcpConnection);
                 Logger.Info<M2TCPSink>($"Lost connection {tcpClient.Client.RemoteEndPoint}: {e.Message}");
             }
         }
