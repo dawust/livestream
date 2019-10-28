@@ -8,7 +8,7 @@ namespace LiveStream
 {
     public class M2TCPSource : ISource
     {
-        private readonly IDictionary<Tuple<int, int>, IChunk> chunks = new Dictionary<Tuple<int, int>, IChunk>();
+        private readonly IDictionary<Tuple<int, Guid>, IChunk> chunks = new Dictionary<Tuple<int, Guid>, IChunk>();
         private readonly MediaQueue queue = new MediaQueue();
 
         private readonly string hostname;
@@ -16,8 +16,8 @@ namespace LiveStream
         private readonly int connections;
         private readonly Guid connectionId;
 
-        private int lastId = 0;
-        private int currentSeed;
+        private int currentFileId;
+        private Guid currentSequence;
 
         public M2TCPSource(string hostname, int port, int connections)
         {
@@ -69,27 +69,27 @@ namespace LiveStream
 
                     while (true)
                     {
-                        var lastCheckedId = 0;
-                        var lastSeed = 0;
-                        IReadOnlyList<Tuple<int, int>> chunkIds = null;
+                        IReadOnlyList<Tuple<int, Guid>> chunkIds;
+                        int lastCheckedFileId;
+                        Guid lastCheckedSequence;
                         
                         lock (chunks)
                         {
                             chunkIds = chunks.Select(c => c.Key).ToList();
-                            lastCheckedId = lastId;
-                            lastSeed = currentSeed;
+                            lastCheckedFileId = currentFileId;
+                            lastCheckedSequence = currentSequence;
                         }
                         
                         foreach (var chunkId in chunkIds)
                         {
                             networkStream.SendInt32(M2TCPSink.SingleIdMagicNumber);
                             networkStream.SendInt32(chunkId.Item1);
-                            networkStream.SendInt32(chunkId.Item2);
+                            networkStream.SendGuid(chunkId.Item2);
                         }
                         
                         networkStream.SendInt32(M2TCPSink.LastIdMagicNumber);
-                        networkStream.SendInt32(lastCheckedId);
-                        networkStream.SendInt32(lastSeed);
+                        networkStream.SendInt32(lastCheckedFileId);
+                        networkStream.SendGuid(lastCheckedSequence);
                         Thread.Sleep(100);
                     }
                 }
@@ -123,7 +123,7 @@ namespace LiveStream
                     {
                         var fileId = networkStream.ReadInt32();
                         var length = networkStream.ReadInt32();
-                        var seed = networkStream.ReadInt32();
+                        var sequence = networkStream.ReadGuid();
 
                         var buffer = new byte[length];
                         networkStream.ReadExactly(buffer, length);
@@ -132,35 +132,35 @@ namespace LiveStream
 
                         lock (chunks)
                         {
-                            chunks[Tuple.Create(fileId, seed)] = chunk;
+                            chunks[Tuple.Create(fileId, sequence)] = chunk;
                             if (fileId == 0)
                             {
-                                Logger.Info<M2TCPSource>($"Got new seed {seed}");
-                                currentSeed = seed;
-                                lastId = 0;
+                                Logger.Info<M2TCPSource>($"Got new sequence {sequence}");
+                                currentSequence = sequence;
+                                currentFileId = 0;
                                 foreach (var chunkId in chunks.Select(c => c.Key)
-                                    .Where(kvp => kvp.Item2 != currentSeed).ToList())
+                                    .Where(kvp => kvp.Item2 != currentSequence).ToList())
                                 {
                                     chunks.Remove(chunkId);
                                 }
                             }
 
-                            while (chunks.ContainsKey(Tuple.Create(lastId, currentSeed)))
+                            while (chunks.ContainsKey(Tuple.Create(currentFileId, currentSequence)))
                             {
-                                var nextChunk = chunks[Tuple.Create(lastId, currentSeed)];
+                                var nextChunk = chunks[Tuple.Create(currentFileId, currentSequence)];
                                 foreach (var chunkId in chunks.Select(c => c.Key)
-                                    .Where(kvp => kvp.Item1 < lastId && kvp.Item2 == currentSeed).ToList())
+                                    .Where(kvp => kvp.Item1 < currentFileId && kvp.Item2 == currentSequence).ToList())
                                 {
                                     chunks.Remove(chunkId);
                                 }
 
                                 queue.Write(nextChunk);
-                                lastId++;
-                                lastCheckedId = lastId;
+                                currentFileId++;
+                                lastCheckedId = currentFileId;
                                 lastCheck = DateTime.Now;
                             }
 
-                            if (lastCheckedId == lastId && lastCheck.AddSeconds(1) < DateTime.Now)
+                            if (lastCheckedId == currentFileId && lastCheck.AddSeconds(1) < DateTime.Now)
                             {
                                 Logger.Warning<M2TCPSource>($"Missing id {lastCheckedId}");
                                 lastCheck = DateTime.Now;

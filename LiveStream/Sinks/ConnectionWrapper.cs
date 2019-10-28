@@ -7,15 +7,15 @@ namespace LiveStream
     public class ConnectionWrapper
     {
         private int fileId = 0;
-        private readonly int seed = 0;
+        private readonly Guid sequence;
         private readonly IConnection connection;
-        private readonly List<WorkChunk> workItems = new List<WorkChunk>();
+        private readonly List<WorkChunk> workChunks = new List<WorkChunk>();
 
         public ConnectionWrapper(IConnection connection)
         {
             this.connection = connection;
             
-            seed = DateTime.Now.GetHashCode() / 100;
+            sequence = Guid.NewGuid();
         }
         
         public WorkChunk GetNextWorkChunk(bool considerRetryQueue)
@@ -35,13 +35,13 @@ namespace LiveStream
                     buffer: receiverChunk.Buffer, 
                     length: receiverChunk.Length, 
                     fileId: chunkFileId,
-                    seed: seed,
+                    sequence: sequence,
                     processed: false,
                     retryAt: DateTime.Now.AddSeconds(1));
                 
-                lock (workItems)
+                lock (workChunks)
                 {
-                    workItems.Add(workChunk);
+                    workChunks.Add(workChunk);
                 }
             }
 
@@ -51,10 +51,10 @@ namespace LiveStream
         private WorkChunk GetWorkChunkToRetryOrNull()
         {
             WorkChunk workChunk;
-            lock (workItems)
+            lock (workChunks)
             {
-                workItems.RemoveAll(wi => wi.Processed);
-                workChunk = workItems.FirstOrDefault(wi => wi.RetryAt < DateTime.Now);
+                workChunks.RemoveAll(wi => wi.Processed);
+                workChunk = workChunks.FirstOrDefault(wi => wi.RetryAt < DateTime.Now);
             }
             
             if (workChunk == null)
@@ -68,9 +68,9 @@ namespace LiveStream
 
         public void FinishWorkChunks(Func<WorkChunk, bool> filter)
         {
-            lock (workItems)
+            lock (workChunks)
             {
-                foreach (var workChunk in workItems.Where(filter).ToList())
+                foreach (var workChunk in workChunks.Where(filter).ToList())
                 {
                     workChunk.Processed = true;
                 }
@@ -79,6 +79,6 @@ namespace LiveStream
         
         public int SourceCount => connection.MediaQueue.Count;
         
-        public int WorkCount => workItems.Count;
+        public int WorkCount => workChunks.Count;
     }
 }

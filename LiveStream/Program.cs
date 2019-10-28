@@ -65,7 +65,7 @@ namespace LiveStream
 
         private static void DisplayHelp(CmdArgs cmdArgs)
         {
-            Console.WriteLine("Streaming Magic TCP 0.6");
+            Console.WriteLine("Streaming Magic TCP 0.62");
             Console.WriteLine("Sources");
             Console.WriteLine("--udp          | UDP Source (default) : ");
             Console.WriteLine("--port         | UDP Port             : " + cmdArgs.UdpPort);

@@ -56,7 +56,7 @@ namespace LiveStream
                 if (magicNumber == ReceiveRequeueThreadMagicNumber || magicNumber == ReceiveOnlyThreadMagicNumber)
                 {
                     var shouldRequeue = magicNumber == ReceiveRequeueThreadMagicNumber;
-                    Logger.Info<M2TCPSink>($"Accept connection {tcpClient.Client.RemoteEndPoint} with connection id {connectionId}");
+                    Logger.Info<M2TCPSink>($"Accept connection {tcpClient.Client.RemoteEndPoint}; Id {connectionId}");
                 
                     using (var m2TcpConnection = m2TcpConnectionManager.GetOrCreateConnection(connectionId))
                     {
@@ -70,7 +70,7 @@ namespace LiveStream
                             if (workChunk.FileId % 50 == 0)
                             {
                                 var processingTime = (DateTime.Now - startTime).Milliseconds;
-                                Logger.Info<M2TCPSink>($"Sent {workChunk.Length} Bytes; Block {workChunk.FileId}; Receiver Queue {m2TcpConnection.SourceCount}; Work Queue {m2TcpConnection.WorkCount}; Time {processingTime}");
+                                Logger.Info<M2TCPSink>($"Sent {workChunk.Length} Bytes; Block {workChunk.FileId}; Connection Queue {m2TcpConnection.SourceCount}; Work Queue {m2TcpConnection.WorkCount}; Time {processingTime}");
                             }
                         }
                     }
@@ -78,7 +78,7 @@ namespace LiveStream
                 
                 if (magicNumber == ControlThreadMagicNumber)
                 {
-                    Logger.Info<M2TCPSink>($"Accept control connection {tcpClient.Client.RemoteEndPoint} with connection id {connectionId}");
+                    Logger.Info<M2TCPSink>($"Accept control connection {tcpClient.Client.RemoteEndPoint}; Id {connectionId}");
                 
                     using (var m2TcpConnection = m2TcpConnectionManager.GetOrCreateConnection(connectionId))
                     {
@@ -86,15 +86,15 @@ namespace LiveStream
                         {
                             var type = stream.ReadInt32();
                             var lastId = stream.ReadInt32();
-                            var seed = stream.ReadInt32();
+                            var sequence = stream.ReadGuid();
 
                             if (type == LastIdMagicNumber)
                             {
-                                m2TcpConnection.FinishWorkChunks(wi => wi.FileId < lastId && wi.Seed == seed); 
+                                m2TcpConnection.FinishWorkChunks(wi => wi.FileId < lastId && wi.Sequence == sequence); 
                             } 
                             else if (type == SingleIdMagicNumber)
                             {
-                                m2TcpConnection.FinishWorkChunks(wi => wi.FileId == lastId && wi.Seed == seed);    
+                                m2TcpConnection.FinishWorkChunks(wi => wi.FileId == lastId && wi.Sequence == sequence);    
                             }
                             else
                             {

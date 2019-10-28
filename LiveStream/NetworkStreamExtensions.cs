@@ -10,7 +10,7 @@ namespace LiveStream
         {
             networkStream.Write(BitConverter.GetBytes(Convert.ToInt32(chunk.FileId)), 0, 4);
             networkStream.Write(BitConverter.GetBytes(Convert.ToInt32(chunk.Length)), 0, 4);
-            networkStream.Write(BitConverter.GetBytes(Convert.ToInt32(chunk.Seed)), 0, 4);
+            networkStream.SendGuid(chunk.Sequence);
             networkStream.Write(chunk.Buffer, 0, chunk.Length);
         }
         

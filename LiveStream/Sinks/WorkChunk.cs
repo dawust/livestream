@@ -4,12 +4,12 @@ namespace LiveStream
 {
     public class WorkChunk : IChunk
     {
-        public WorkChunk(byte[] buffer, int length, int fileId, int seed, bool processed, DateTime retryAt)
+        public WorkChunk(byte[] buffer, int length, int fileId, Guid sequence, bool processed, DateTime retryAt)
         {
             Buffer = buffer;
             Length = length;
             FileId = fileId;
-            Seed = seed;
+            Sequence = sequence;
             Processed = processed;
             RetryAt = retryAt;
         }
@@ -19,7 +19,7 @@ namespace LiveStream
 
         public int FileId { get; }
 
-        public int Seed { get; }
+        public Guid Sequence { get; }
         
         public bool Processed { get; set; }
         
