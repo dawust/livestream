@@ -5,7 +5,7 @@ namespace LiveStream
 {
     public class M2TCPConnectionManager
     {
-        private readonly IDictionary<int, M2TCPConnection> m2TcpConnections = new Dictionary<int, M2TCPConnection>();
+        private readonly IDictionary<Guid, M2TCPConnection> m2TcpConnections = new Dictionary<Guid, M2TCPConnection>();
 
         private readonly IConnectionManager connectionManager;
 
@@ -14,7 +14,7 @@ namespace LiveStream
             this.connectionManager = connectionManager;
         }
         
-        public IM2TCPConnection GetOrCreateConnection(int connectionId)
+        public IM2TCPConnection GetOrCreateConnection(Guid connectionId)
         {
             lock (m2TcpConnections)
             {
@@ -31,7 +31,7 @@ namespace LiveStream
             }
         }
 
-        private void CloseConnection(int connectionId)
+        private void CloseConnection(Guid connectionId)
         {
             lock (m2TcpConnections)
             {

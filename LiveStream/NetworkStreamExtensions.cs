@@ -8,8 +8,8 @@ namespace LiveStream
     {
         public static void SendWorkChunk(this NetworkStream networkStream, WorkChunk chunk)
         {
-            networkStream.Write(BitConverter.GetBytes(Convert.ToUInt32(chunk.FileId)), 0, 4);
-            networkStream.Write(BitConverter.GetBytes(Convert.ToUInt32(chunk.Length)), 0, 4);
+            networkStream.Write(BitConverter.GetBytes(Convert.ToInt32(chunk.FileId)), 0, 4);
+            networkStream.Write(BitConverter.GetBytes(Convert.ToInt32(chunk.Length)), 0, 4);
             networkStream.Write(BitConverter.GetBytes(Convert.ToInt32(chunk.Seed)), 0, 4);
             networkStream.Write(chunk.Buffer, 0, chunk.Length);
         }
@@ -18,6 +18,11 @@ namespace LiveStream
         {
             networkStream.Write(BitConverter.GetBytes(Convert.ToInt32(number)), 0, 4);
         }
+
+        public static void SendGuid(this NetworkStream networkStream, Guid guid)
+        {
+            networkStream.Write(guid.ToByteArray(), 0, 16);
+        }
         
         public static int ReadInt32(this NetworkStream networkStream)
         {
@@ -25,6 +30,14 @@ namespace LiveStream
             networkStream.ReadExactly(buffer, 4);
             
             return BitConverter.ToInt32(buffer, 0);
+        }
+        
+        public static Guid ReadGuid(this NetworkStream networkStream)
+        {
+            var buffer = new byte[16];
+            networkStream.ReadExactly(buffer, 16);
+            
+            return new Guid(buffer);
         }
 
         public static void ReadExactly(this NetworkStream networkStream, byte[] buffer, int size)

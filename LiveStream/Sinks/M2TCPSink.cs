@@ -51,7 +51,7 @@ namespace LiveStream
                 var stream = tcpClient.GetStream();
 
                 var magicNumber = stream.ReadInt32();
-                var connectionId = stream.ReadInt32();
+                var connectionId = stream.ReadGuid();
 
                 if (magicNumber == ReceiveRequeueThreadMagicNumber || magicNumber == ReceiveOnlyThreadMagicNumber)
                 {

@@ -14,7 +14,7 @@ namespace LiveStream
         private readonly string hostname;
         private readonly int port;
         private readonly int connections;
-        private readonly int connectionId;
+        private readonly Guid connectionId;
 
         private int lastId = 0;
         private int currentSeed;
@@ -24,7 +24,7 @@ namespace LiveStream
             this.hostname = hostname;
             this.port = port;
             this.connections = connections;
-            this.connectionId = DateTime.Now.GetHashCode() / 100;
+            this.connectionId = Guid.NewGuid();
         }
 
         public MediaQueue StartSource()
@@ -65,7 +65,7 @@ namespace LiveStream
                     var networkStream = tcpClient.GetStream();
 
                     networkStream.SendInt32(M2TCPSink.ControlThreadMagicNumber);
-                    networkStream.SendInt32(connectionId);
+                    networkStream.SendGuid(connectionId);
 
                     while (true)
                     {
@@ -117,7 +117,7 @@ namespace LiveStream
                     var lastCheck = DateTime.Now;
 
                     networkStream.SendInt32(shouldRequeue ? M2TCPSink.ReceiveRequeueThreadMagicNumber : M2TCPSink.ReceiveOnlyThreadMagicNumber);
-                    networkStream.SendInt32(connectionId);
+                    networkStream.SendGuid(connectionId);
 
                     while (true)
                     {
