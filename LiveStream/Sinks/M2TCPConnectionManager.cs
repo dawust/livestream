@@ -62,9 +62,9 @@ namespace LiveStream
                 connectionWrapper = new ConnectionWrapper(connection);
             }
         
-            public WorkChunk GetNextWorkChunk() => connectionWrapper.GetNextWorkChunk();
+            public WorkChunk GetNextWorkChunk(bool considerRetryQueue) => connectionWrapper.GetNextWorkChunk(considerRetryQueue);
 
-            public void FinishWorkChunks(int lastId, int seed) => connectionWrapper.FinishWorkChunks(lastId, seed);
+            public void FinishWorkChunks(Func<WorkChunk, bool> filter) => connectionWrapper.FinishWorkChunks(filter);
 
             public int SourceCount => connectionWrapper.SourceCount;
         

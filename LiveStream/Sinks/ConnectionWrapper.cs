@@ -18,9 +18,9 @@ namespace LiveStream
             seed = DateTime.Now.GetHashCode() / 100;
         }
         
-        public WorkChunk GetNextWorkChunk()
+        public WorkChunk GetNextWorkChunk(bool considerRetryQueue)
         {
-            var workChunk = GetWorkChunkToRetryOrNull();
+            var workChunk = considerRetryQueue ? GetWorkChunkToRetryOrNull() : null;
             
             if (workChunk == null)
             {
@@ -66,11 +66,11 @@ namespace LiveStream
             return workChunk;
         }
 
-        public void FinishWorkChunks(int lastId, int seed)
+        public void FinishWorkChunks(Func<WorkChunk, bool> filter)
         {
             lock (workItems)
             {
-                foreach (var workChunk in workItems.Where(wi => wi.FileId < lastId && wi.Seed == seed).ToList())
+                foreach (var workChunk in workItems.Where(filter).ToList())
                 {
                     workChunk.Processed = true;
                 }

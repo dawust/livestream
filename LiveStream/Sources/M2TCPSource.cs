@@ -30,11 +30,19 @@ namespace LiveStream
         public MediaQueue StartSource()
         {
             Logger.Info<M2TCPSource>($"Start {connections} connections");
-            for (var tid = 0; tid < connections; tid++)
+            
+            for (var tid = 0; tid < (connections + 1) / 2; tid++)
             {
-                var thread = new Thread(ReceiveThread);
+                var thread = new Thread(() => ReceiveThread(shouldRequeue: true));
                 thread.Priority = ThreadPriority.Lowest;
-                thread.Start(tid);
+                thread.Start();
+            }
+            
+            for (var tid = 0; tid < (connections + 1) / 2; tid++)
+            {
+                var thread = new Thread(() => ReceiveThread(shouldRequeue: false));
+                thread.Priority = ThreadPriority.Lowest;
+                thread.Start();
             }
             
             var controlThread = new Thread(ControlThread);
@@ -43,7 +51,7 @@ namespace LiveStream
             return queue;
         }
 
-        private void ControlThread(object o)
+        private void ControlThread()
         {
             while (true)
             {
@@ -56,19 +64,30 @@ namespace LiveStream
                     tcpClient.NoDelay = true;
                     var networkStream = tcpClient.GetStream();
 
-                    networkStream.SendInt32(M2TCPSink.ControlThreadMagicByte);
+                    networkStream.SendInt32(M2TCPSink.ControlThreadMagicNumber);
                     networkStream.SendInt32(connectionId);
 
                     while (true)
                     {
                         var lastCheckedId = 0;
                         var lastSeed = 0;
+                        IReadOnlyList<Tuple<int, int>> chunkIds = null;
+                        
                         lock (chunks)
                         {
+                            chunkIds = chunks.Select(c => c.Key).ToList();
                             lastCheckedId = lastId;
                             lastSeed = currentSeed;
                         }
                         
+                        foreach (var chunkId in chunkIds)
+                        {
+                            networkStream.SendInt32(M2TCPSink.SingleIdMagicNumber);
+                            networkStream.SendInt32(chunkId.Item1);
+                            networkStream.SendInt32(chunkId.Item2);
+                        }
+                        
+                        networkStream.SendInt32(M2TCPSink.LastIdMagicNumber);
                         networkStream.SendInt32(lastCheckedId);
                         networkStream.SendInt32(lastSeed);
                         Thread.Sleep(100);
@@ -83,7 +102,7 @@ namespace LiveStream
             }
         }
 
-        private void ReceiveThread(object o)
+        private void ReceiveThread(bool shouldRequeue)
         {
             while (true)
             {
@@ -97,7 +116,7 @@ namespace LiveStream
                     var lastCheckedId = 0;
                     var lastCheck = DateTime.Now;
 
-                    networkStream.SendInt32(M2TCPSink.MagicByte);
+                    networkStream.SendInt32(shouldRequeue ? M2TCPSink.ReceiveRequeueThreadMagicNumber : M2TCPSink.ReceiveOnlyThreadMagicNumber);
                     networkStream.SendInt32(connectionId);
 
                     while (true)

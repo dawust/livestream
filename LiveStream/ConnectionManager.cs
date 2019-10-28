@@ -45,21 +45,23 @@ namespace LiveStream
         
         private class Connection : IConnection
         {
-            private readonly Action destructorAction;
+            private Action DestructorAction { get; }
             public bool IsAlive { get; private set; }
-            public MediaQueue MediaQueue { get; }
+            public MediaQueue MediaQueue { get; private set; }
         
             public Connection(MediaQueue mediaQueue, Action destructorAction)
             {
                 MediaQueue = mediaQueue;
                 IsAlive = true;
-                this.destructorAction = destructorAction;
+                DestructorAction = destructorAction;
             }
 
             public void Dispose()
             {
                 IsAlive = false;
-                destructorAction();
+                DestructorAction();
+                MediaQueue.Clear();
+                MediaQueue = null;
             }
         }
     }

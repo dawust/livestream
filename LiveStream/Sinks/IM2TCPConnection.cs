@@ -4,9 +4,9 @@ namespace LiveStream
 {
     public interface IM2TCPConnection : IDisposable
     {
-        WorkChunk GetNextWorkChunk();
+        WorkChunk GetNextWorkChunk(bool considerRetryQueue);
 
-        void FinishWorkChunks(int lastId, int seed);
+        void FinishWorkChunks(Func<WorkChunk, bool> filter);
 
         int SourceCount { get; }
         

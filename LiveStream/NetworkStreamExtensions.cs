@@ -22,17 +22,12 @@ namespace LiveStream
         public static int ReadInt32(this NetworkStream networkStream)
         {
             var buffer = new byte[4];
-            var length = networkStream.ReadExactly(buffer, 4);
-            
-            if (length != 4)
-            {
-                throw new Exception("Did not receive 4 bytes");
-            }
+            networkStream.ReadExactly(buffer, 4);
             
             return BitConverter.ToInt32(buffer, 0);
         }
 
-        public static int ReadExactly(this NetworkStream networkStream, byte[] buffer, int size)
+        public static void ReadExactly(this NetworkStream networkStream, byte[] buffer, int size)
         {
             var receivedLength = 0;
             while (receivedLength < size)
@@ -45,8 +40,6 @@ namespace LiveStream
                 
                 receivedLength += length;
             }
-
-            return receivedLength;
         }
     }
 }
