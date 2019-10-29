@@ -2,29 +2,29 @@ using System;
 
 namespace LiveStream
 {
-    public static class Logger
+    public class Logger<T>
     {
-        public static void Info<T>(string text)
+        public void Info(string text)
         {
-            Log<T>(text, Severity.Info);    
+            Log(text, Severity.Info);    
         }
         
-        public static void Debug<T>(string text)
+        public void Debug(string text)
         {
-            Log<T>(text, Severity.Debug);    
+            Log(text, Severity.Debug);    
         }
         
-        public static void Warning<T>(string text)
+        public void Warning(string text)
         {
-            Log<T>(text, Severity.Warning);    
+            Log(text, Severity.Warning);    
         }
 
-        public static void Error<T>(string text)
+        public void Error(string text)
         {
-            Log<T>(text, Severity.Error);    
+            Log(text, Severity.Error);    
         }
         
-        private static void Log<T>(string text, Severity logLevel)
+        private void Log(string text, Severity logLevel)
         {
             Console.Error.WriteLine($"[{DateTime.Now.ToString()}][{logLevel}][{typeof(T).Name}]: {text}");
         }

@@ -2,6 +2,6 @@
 {
     public interface ISource
     {
-        MediaQueue StartSource();
+        void SourceLoop(MediaQueue mediaQueue);
     }
 }

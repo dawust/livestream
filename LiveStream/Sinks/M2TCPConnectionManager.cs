@@ -48,6 +48,7 @@ namespace LiveStream
         
         private class M2TCPConnection : IM2TCPConnection
         {
+            private readonly Logger<M2TCPConnection> logger = new Logger<M2TCPConnection>();
             private readonly IConnection connection;
             private readonly Action destructorAction;
             private readonly ConnectionWrapper connectionWrapper;
@@ -82,7 +83,7 @@ namespace LiveStream
             {
                 if (references < 0)
                 {
-                    Logger.Error<M2TCPConnection>("Less than 0 references");
+                    logger.Error("Less than 0 references");
                 }
                 
                 return references <= 0;

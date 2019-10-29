@@ -8,14 +8,15 @@ namespace LiveStream
 {
     public class M2TCPSource : ISource
     {
+        private readonly Logger<M2TCPSource> logger = new Logger<M2TCPSource>();
         private readonly IDictionary<Tuple<int, Guid>, IChunk> chunks = new Dictionary<Tuple<int, Guid>, IChunk>();
-        private readonly MediaQueue queue = new MediaQueue();
 
         private readonly string hostname;
         private readonly int port;
         private readonly int connections;
         private readonly Guid connectionId;
 
+        private MediaQueue queue;
         private int currentFileId;
         private Guid currentSequence;
 
@@ -27,9 +28,10 @@ namespace LiveStream
             this.connectionId = Guid.NewGuid();
         }
 
-        public MediaQueue StartSource()
+        public void SourceLoop(MediaQueue mediaQueue)
         {
-            Logger.Info<M2TCPSource>($"Start {connections} connections");
+            queue = mediaQueue;
+            logger.Info($"Start {connections} connections");
             
             for (var tid = 0; tid < (connections + 1) / 2; tid++)
             {
@@ -47,15 +49,13 @@ namespace LiveStream
             
             var controlThread = new Thread(ControlThread);
             controlThread.Start();
-
-            return queue;
         }
 
         private void ControlThread()
         {
             while (true)
             {
-                Logger.Info<M2TCPSource>("Start control thread");
+                logger.Info("Start control thread");
                 try
                 {
                     var tcpClient = new TcpClient(hostname, port);
@@ -95,7 +95,7 @@ namespace LiveStream
                 }
                 catch (Exception e)
                 {
-                    Logger.Warning<M2TCPSource>($"Control thread connection closed: {e.Message}");
+                    logger.Warning($"Control thread connection closed: {e.Message}");
                 }
 
                 Thread.Sleep(1000);
@@ -124,9 +124,7 @@ namespace LiveStream
                         var fileId = networkStream.ReadInt32();
                         var length = networkStream.ReadInt32();
                         var sequence = networkStream.ReadGuid();
-
-                        var buffer = new byte[length];
-                        networkStream.ReadExactly(buffer, length);
+                        var buffer = networkStream.ReadExactly(length);
 
                         var chunk = new Chunk(buffer, length);
 
@@ -135,7 +133,7 @@ namespace LiveStream
                             chunks[Tuple.Create(fileId, sequence)] = chunk;
                             if (fileId == 0)
                             {
-                                Logger.Info<M2TCPSource>($"Got new sequence {sequence}");
+                                logger.Info($"Got new sequence {sequence}");
                                 currentSequence = sequence;
                                 currentFileId = 0;
                                 foreach (var chunkId in chunks.Select(c => c.Key)
@@ -162,7 +160,7 @@ namespace LiveStream
 
                             if (lastCheckedId == currentFileId && lastCheck.AddSeconds(1) < DateTime.Now)
                             {
-                                Logger.Warning<M2TCPSource>($"Missing id {lastCheckedId}");
+                                logger.Warning($"Missing id {lastCheckedId}");
                                 lastCheck = DateTime.Now;
                             }
                         }
@@ -170,7 +168,7 @@ namespace LiveStream
                 }
                 catch (Exception e)
                 {
-                    Logger.Warning<M2TCPSource>($"Connection closed: {e.Message}");
+                    logger.Warning($"Connection closed: {e.Message}");
                 }
 
                 Thread.Sleep(1000);

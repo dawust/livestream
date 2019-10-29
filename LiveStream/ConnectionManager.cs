@@ -6,6 +6,7 @@ namespace LiveStream
 {
     public class ConnectionManager : IConnectionManager
     {
+        private readonly Logger<ConnectionManager> logger = new Logger<ConnectionManager>();
         private readonly List<Connection> connections = new List<Connection>();
         private List<IConnection> connectionsClone = new List<IConnection>();
 
@@ -21,7 +22,7 @@ namespace LiveStream
             }
             
             var connectionCount = GetConnections().Count;
-            Logger.Info<ConnectionManager>($"New connection established, {connectionCount} connections");
+            logger.Info($"New connection established, {connectionCount} connections");
 
             return connection;
         }
@@ -35,7 +36,7 @@ namespace LiveStream
             }
             
             var connectionCount = GetConnections().Count;
-            Logger.Info<ConnectionManager>($"Connection removed, {connectionCount} connections");
+            logger.Info($"Connection removed, {connectionCount} connections");
         }
 
         public IList<IConnection> GetConnections()

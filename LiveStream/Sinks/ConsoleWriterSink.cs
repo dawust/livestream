@@ -5,17 +5,10 @@ namespace LiveStream
 {
     public class ConsoleWriterSink : ISink
     {
-        private IConnection connection;
-        
-        public void StartSink(IConnectionManager connectionManager)
+        public void SinkLoop(IConnectionManager connectionManager)
         {
-            connection = connectionManager.CreateConnection();
+            var connection = connectionManager.CreateConnection();
             
-            new Thread(WriteLoop).Start();
-        }
-        
-        private void WriteLoop()
-        {
             var console = Console.OpenStandardOutput();
             
             while (true)

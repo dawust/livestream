@@ -7,6 +7,8 @@ namespace LiveStream
     {
         public static void Main(string[] args)
         {
+            var logger = new Logger<Program>();
+        
             System.Net.ServicePointManager.DefaultConnectionLimit = 50;
             System.Net.ServicePointManager.MaxServicePoints = 50;
 
@@ -39,7 +41,7 @@ namespace LiveStream
             }
             catch (OptionException e)
             {
-                Logger.Error<Program>(e.Message);
+                logger.Error(e.Message);
                 Console.WriteLine(e.Message);
                 return;
             }
@@ -51,16 +53,15 @@ namespace LiveStream
             
             Thread.CurrentThread.Priority = ThreadPriority.Highest;
 
+            var mediaQueue = new MediaQueue();
             var connectionManager = new ConnectionManager();
-            
-            var sink = new SinkFactory().CreateSink(cmdArgs);
-            sink.StartSink(connectionManager);
-            
             var source = new SourceFactory().CreateSource(cmdArgs);
-            var queue = source.StartSource();
+            var sink = new SinkFactory().CreateSink(cmdArgs);    
+                
+            new Thread(() => source.SourceLoop(mediaQueue)).Start();
+            new Thread(() => sink.SinkLoop(connectionManager)).Start();
             
-            var distributor = new Distributor();
-            distributor.DistributionLoop(queue, connectionManager);            
+            new Distributor().DistributionLoop(mediaQueue, connectionManager);            
         }
 
         private static void DisplayHelp(CmdArgs cmdArgs)

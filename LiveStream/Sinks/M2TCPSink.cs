@@ -13,7 +13,8 @@ namespace LiveStream
         
         public const int LastIdMagicNumber = 1337;
         public const int SingleIdMagicNumber = 31337;
-        
+     
+        private readonly Logger<M2TCPSink> logger = new Logger<M2TCPSink>();
         private readonly TcpListener listener;
         private M2TCPConnectionManager m2TcpConnectionManager;
 
@@ -22,14 +23,9 @@ namespace LiveStream
             listener = new TcpListener(IPAddress.Any, port);
         }
 
-        public void StartSink(IConnectionManager connectionManager)
+        public void SinkLoop(IConnectionManager connectionManager)
         {
             m2TcpConnectionManager = new M2TCPConnectionManager(connectionManager);
-            new Thread(ReceiveLoop).Start();
-        }
-
-        private void ReceiveLoop()
-        {
             listener.Start();
 
             while (true)
@@ -56,7 +52,7 @@ namespace LiveStream
                 if (magicNumber == ReceiveRequeueThreadMagicNumber || magicNumber == ReceiveOnlyThreadMagicNumber)
                 {
                     var shouldRequeue = magicNumber == ReceiveRequeueThreadMagicNumber;
-                    Logger.Info<M2TCPSink>($"Accept connection {tcpClient.Client.RemoteEndPoint}; Id {connectionId}");
+                    logger.Info($"Accept connection {tcpClient.Client.RemoteEndPoint}; Id {connectionId}");
                 
                     using (var m2TcpConnection = m2TcpConnectionManager.GetOrCreateConnection(connectionId))
                     {
@@ -70,7 +66,7 @@ namespace LiveStream
                             if (workChunk.FileId % 50 == 0)
                             {
                                 var processingTime = (DateTime.Now - startTime).Milliseconds;
-                                Logger.Info<M2TCPSink>($"Sent {workChunk.Length} Bytes; Block {workChunk.FileId}; Connection Queue {m2TcpConnection.SourceCount}; Work Queue {m2TcpConnection.WorkCount}; Time {processingTime}");
+                                logger.Info($"Sent {workChunk.Length} Bytes; Block {workChunk.FileId}; Connection Queue {m2TcpConnection.SourceCount}; Work Queue {m2TcpConnection.WorkCount}; Time {processingTime}");
                             }
                         }
                     }
@@ -78,7 +74,7 @@ namespace LiveStream
                 
                 if (magicNumber == ControlThreadMagicNumber)
                 {
-                    Logger.Info<M2TCPSink>($"Accept control connection {tcpClient.Client.RemoteEndPoint}; Id {connectionId}");
+                    logger.Info($"Accept control connection {tcpClient.Client.RemoteEndPoint}; Id {connectionId}");
                 
                     using (var m2TcpConnection = m2TcpConnectionManager.GetOrCreateConnection(connectionId))
                     {
@@ -109,7 +105,7 @@ namespace LiveStream
             }
             catch (Exception e)
             {
-                Logger.Info<M2TCPSink>($"Lost connection {tcpClient.Client.RemoteEndPoint}: {e.Message}");
+                logger.Warning($"Lost connection {tcpClient.Client.RemoteEndPoint}: {e.Message}");
             }
         }
     }

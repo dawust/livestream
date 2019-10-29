@@ -7,28 +7,21 @@ namespace LiveStream
     class HttpSource : ISource
     {
         private const int ReceiveSize = 16384;
-        private readonly string httpUri;
-        private readonly MediaQueue queue = new MediaQueue();
         
+        private readonly Logger<HttpSource> logger = new Logger<HttpSource>();
+        private readonly string httpUri;
         public HttpSource(string httpUri)
         {
             this.httpUri = httpUri;
         }
         
-        public MediaQueue StartSource()
-        {
-            new Thread(ReceiveLoop).Start();
-            
-            return queue;
-        }
-
-        private void ReceiveLoop()
+        public void SourceLoop(MediaQueue mediaQueue)
         {
             while (true)
             {
                 try
                 {
-                    Logger.Info<HttpSource>($"Read from {httpUri}");
+                    logger.Info($"Read from {httpUri}");
 
                     var request = (HttpWebRequest) WebRequest.Create(httpUri);
                     var responseStream = ((HttpWebResponse) request.GetResponse()).GetResponseStream();
@@ -44,12 +37,12 @@ namespace LiveStream
 
                         var writer = new Chunk(buffer, receivedLength);
 
-                        queue.Write(writer);
+                        mediaQueue.Write(writer);
                     }
                 }
                 catch (Exception e)
                 {
-                    Logger.Error<HttpSource>($"Lost connection to {httpUri}: {e.Message}");
+                    logger.Error($"Lost connection to {httpUri}: {e.Message}");
                     Thread.Sleep(2000);
                 }
             }

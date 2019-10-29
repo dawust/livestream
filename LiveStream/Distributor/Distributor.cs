@@ -4,6 +4,8 @@ namespace LiveStream
 {
     public class Distributor
     {
+        private readonly Logger<Distributor> logger = new Logger<Distributor>();
+        
         public void DistributionLoop(MediaQueue source, ConnectionManager connectionManager)
         {
             while (true)
@@ -19,14 +21,14 @@ namespace LiveStream
                         if (queue.Count > 1000)
                         {
                             queue.Clear();
-                            Logger.Warning<Distributor>("Buffer overflow in connection");
+                            logger.Warning("Buffer overflow in connection");
                         }
                         
                         queue.Write(chunk);
                     }
                     catch (Exception e)
                     {
-                        Logger.Error<Distributor>(e.Message);
+                        logger.Error(e.Message);
                     }
                 }
             }

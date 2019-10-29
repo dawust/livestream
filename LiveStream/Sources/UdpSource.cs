@@ -7,21 +7,14 @@ namespace LiveStream
 {
     class UdpSource : ISource
     {
+        private readonly Logger<UdpSource> logger = new Logger<UdpSource>();
         private readonly int udpPort;
-        private readonly MediaQueue queue = new MediaQueue();
         public UdpSource(int udpPort)
         {
             this.udpPort = udpPort;
         }
         
-        public MediaQueue StartSource()
-        {
-            new Thread(ReceiveLoop).Start();
-            
-            return queue;
-        }
-
-        private void ReceiveLoop()
+        public void SourceLoop(MediaQueue mediaQueue)
         {
             while (true)
             {
@@ -35,12 +28,12 @@ namespace LiveStream
                         var buffer = udpClient.Receive(ref endPoint);
 
                         var chunk = new Chunk(buffer, buffer.Length);
-                        queue.Write(chunk);
+                        mediaQueue.Write(chunk);
                     }
                 }
                 catch (Exception e)
                 {
-                    Logger.Error<UdpSource>(e.Message);
+                    logger.Error(e.Message);
                 }
             }
         }

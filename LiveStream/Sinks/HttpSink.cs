@@ -8,7 +8,8 @@ namespace LiveStream
 {
     public class HttpSink : ISink
     {
-        private TcpListener listener;
+        private readonly Logger<HttpSink> logger = new Logger<HttpSink>();
+        private readonly TcpListener listener;
         private IConnectionManager connectionManager;
 
         public HttpSink(int port)
@@ -16,14 +17,9 @@ namespace LiveStream
             listener = new TcpListener(IPAddress.Any, port);
         }
 
-        public void StartSink(IConnectionManager connectionManager)
+        public void SinkLoop(IConnectionManager connectionManager)
         {
             this.connectionManager = connectionManager;
-            new Thread(ReceiveLoop).Start();
-        }
-
-        private void ReceiveLoop()
-        {
             listener.Start();
 
             while (true)
@@ -33,7 +29,7 @@ namespace LiveStream
                 thread.Start(client);
             }
         }
-        
+
         private void Listen(object o)
         {
             var tcpClient = (TcpClient) o;
@@ -66,7 +62,7 @@ namespace LiveStream
             }
             catch (Exception e)
             {
-                Logger.Info<HttpSink>($"Lost connection {tcpClient.Client.RemoteEndPoint}: {e.Message}");
+                logger.Info($"Lost connection {tcpClient.Client.RemoteEndPoint}: {e.Message}");
             }
         }
     }
