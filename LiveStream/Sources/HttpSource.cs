@@ -35,9 +35,8 @@ namespace LiveStream
                             receivedLength += responseStream.Read(buffer, receivedLength, ReceiveSize);
                         }
 
-                        var writer = new Chunk(buffer, receivedLength);
-
-                        mediaQueue.Write(writer);
+                        var chunk = new Chunk(buffer, receivedLength);
+                        mediaQueue.Write(chunk);
                     }
                 }
                 catch (Exception e)

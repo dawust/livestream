@@ -42,7 +42,6 @@ namespace LiveStream
             catch (OptionException e)
             {
                 logger.Error(e.Message);
-                Console.WriteLine(e.Message);
                 return;
             }
 
