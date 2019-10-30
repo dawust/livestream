@@ -131,7 +131,7 @@ namespace LiveStream
                         lock (chunks)
                         {
                             chunks[Tuple.Create(fileId, sequence)] = chunk;
-                            if (fileId == 0)
+                            if (fileId == 0 && currentSequence != sequence)
                             {
                                 logger.Info($"Got new sequence {sequence}");
                                 currentSequence = sequence;
