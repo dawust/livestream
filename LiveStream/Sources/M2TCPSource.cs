@@ -64,8 +64,8 @@ namespace LiveStream
                     tcpClient.NoDelay = true;
                     var networkStream = tcpClient.GetStream();
 
-                    networkStream.SendInt32(M2TCPSink.ControlThreadMagicNumber);
-                    networkStream.SendGuid(connectionId);
+                    networkStream.WriteInt32(M2TCPSink.ControlThreadMagicNumber);
+                    networkStream.WriteGuid(connectionId);
 
                     while (true)
                     {
@@ -82,14 +82,14 @@ namespace LiveStream
                         
                         foreach (var chunkId in chunkIds)
                         {
-                            networkStream.SendInt32(M2TCPSink.SingleIdMagicNumber);
-                            networkStream.SendInt32(chunkId.Item1);
-                            networkStream.SendGuid(chunkId.Item2);
+                            networkStream.WriteInt32(M2TCPSink.SingleIdMagicNumber);
+                            networkStream.WriteInt32(chunkId.Item1);
+                            networkStream.WriteGuid(chunkId.Item2);
                         }
                         
-                        networkStream.SendInt32(M2TCPSink.LastIdMagicNumber);
-                        networkStream.SendInt32(lastCheckedFileId);
-                        networkStream.SendGuid(lastCheckedSequence);
+                        networkStream.WriteInt32(M2TCPSink.LastIdMagicNumber);
+                        networkStream.WriteInt32(lastCheckedFileId);
+                        networkStream.WriteGuid(lastCheckedSequence);
                         Thread.Sleep(100);
                     }
                 }
@@ -116,8 +116,8 @@ namespace LiveStream
                     var lastCheckedId = 0;
                     var lastCheck = DateTime.Now;
 
-                    networkStream.SendInt32(shouldRequeue ? M2TCPSink.ReceiveRequeueThreadMagicNumber : M2TCPSink.ReceiveOnlyThreadMagicNumber);
-                    networkStream.SendGuid(connectionId);
+                    networkStream.WriteInt32(shouldRequeue ? M2TCPSink.ReceiveRequeueThreadMagicNumber : M2TCPSink.ReceiveOnlyThreadMagicNumber);
+                    networkStream.WriteGuid(connectionId);
 
                     while (true)
                     {

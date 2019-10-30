@@ -1,49 +1,55 @@
 using System;
+using System.IO;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
 namespace LiveStream
 {
-    public static class NetworkStreamExtensions
+    public static class StreamExtensions
     {
-        public static void SendWorkChunk(this NetworkStream networkStream, WorkChunk chunk)
+        public static void WriteWorkChunk(this Stream stream, WorkChunk chunk)
         {
-            networkStream.SendInt32(chunk.FileId);
-            networkStream.SendInt32(chunk.Length);
-            networkStream.SendGuid(chunk.Sequence);
-            networkStream.Write(chunk.Buffer, 0, chunk.Length);
-        }
-        
-        public static void SendInt32(this NetworkStream networkStream, int number)
-        {
-            networkStream.Write(BitConverter.GetBytes(Convert.ToInt32(number)), 0, 4);
+            stream.WriteInt32(chunk.FileId);
+            stream.WriteInt32(chunk.Length);
+            stream.WriteGuid(chunk.Sequence);
+            stream.WriteChunk(chunk);
         }
 
-        public static void SendGuid(this NetworkStream networkStream, Guid guid)
+        public static void WriteChunk(this Stream stream, IChunk chunk)
         {
-            networkStream.Write(guid.ToByteArray(), 0, 16);
+            stream.Write(chunk.Buffer, 0, chunk.Length);
         }
         
-        public static int ReadInt32(this NetworkStream networkStream)
+        public static void WriteInt32(this Stream stream, int number)
         {
-            var buffer = networkStream.ReadExactly(4);
+            stream.Write(BitConverter.GetBytes(Convert.ToInt32(number)), 0, 4);
+        }
+
+        public static void WriteGuid(this Stream stream, Guid guid)
+        {
+            stream.Write(guid.ToByteArray(), 0, 16);
+        }
+        
+        public static int ReadInt32(this Stream stream)
+        {
+            var buffer = stream.ReadExactly(4);
             
             return BitConverter.ToInt32(buffer, 0);
         }
         
-        public static Guid ReadGuid(this NetworkStream networkStream)
+        public static Guid ReadGuid(this Stream stream)
         {
-            var buffer = networkStream.ReadExactly( 16);
+            var buffer = stream.ReadExactly( 16);
             return new Guid(buffer);
         }
 
-        public static byte[] ReadExactly(this NetworkStream networkStream, int size)
+        public static byte[] ReadExactly(this Stream stream, int size)
         {
             var buffer = new byte[size];
             var receivedLength = 0;
             while (receivedLength < size)
             {
-                var length = networkStream.Read(buffer, receivedLength, size - receivedLength);
+                var length = stream.Read(buffer, receivedLength, size - receivedLength);
                 if (length == 0)
                 {
                     throw new Exception("Socket was closed, returned 0 bytes");

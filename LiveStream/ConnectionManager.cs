@@ -8,7 +8,7 @@ namespace LiveStream
     {
         private readonly Logger<ConnectionManager> logger = new Logger<ConnectionManager>();
         private readonly List<Connection> connections = new List<Connection>();
-        private List<IConnection> connectionsClone = new List<IConnection>();
+        private IReadOnlyList<IConnection> connectionsClone = new List<IConnection>();
 
         public IConnection CreateConnection()
         {            
@@ -39,7 +39,7 @@ namespace LiveStream
             logger.Info($"Connection removed, {connectionCount} connections");
         }
 
-        public IList<IConnection> GetConnections()
+        public IReadOnlyList<IConnection> GetConnections()
         {
             return connectionsClone;
         }

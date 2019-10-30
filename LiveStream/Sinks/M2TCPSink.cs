@@ -61,7 +61,7 @@ namespace LiveStream
                             var workChunk = m2TcpConnection.GetNextWorkChunk(considerRetryQueue: shouldRequeue);
                     
                             var startTime = DateTime.Now;
-                            stream.SendWorkChunk(workChunk);
+                            stream.WriteWorkChunk(workChunk);
                     
                             if (workChunk.FileId % 50 == 0)
                             {

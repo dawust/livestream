@@ -14,7 +14,7 @@ namespace LiveStream
             while (true)
             {
                 var chunk = connection.MediaQueue.ReadBlocking();
-                console.Write(chunk.Buffer, 0, chunk.Length);
+                console.WriteChunk(chunk);
             }
         }
     }
