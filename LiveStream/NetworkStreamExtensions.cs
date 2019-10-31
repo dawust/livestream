@@ -7,7 +7,7 @@ namespace LiveStream
 {
     public static class StreamExtensions
     {
-        public static void WriteWorkChunk(this Stream stream, WorkChunk chunk)
+        public static void WriteWorkChunk(this Stream stream, IWorkChunk chunk)
         {
             stream.WriteInt32(chunk.FileId);
             stream.WriteInt32(chunk.Length);
@@ -29,6 +29,16 @@ namespace LiveStream
         {
             stream.Write(guid.ToByteArray(), 0, 16);
         }
+
+        public static IWorkChunk ReadWorkChunk(this Stream stream)
+        {
+            var fileId = stream.ReadInt32();
+            var length = stream.ReadInt32();
+            var sequence = stream.ReadGuid();
+            var buffer = stream.ReadExactly(length);
+            
+            return new WorkChunk(buffer, length, fileId, sequence);
+        }
         
         public static int ReadInt32(this Stream stream)
         {
@@ -39,11 +49,12 @@ namespace LiveStream
         
         public static Guid ReadGuid(this Stream stream)
         {
-            var buffer = stream.ReadExactly( 16);
+            var buffer = stream.ReadExactly(16);
+            
             return new Guid(buffer);
         }
 
-        public static byte[] ReadExactly(this Stream stream, int size)
+        private static byte[] ReadExactly(this Stream stream, int size)
         {
             var buffer = new byte[size];
             var receivedLength = 0;

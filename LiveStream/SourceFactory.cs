@@ -2,7 +2,7 @@ namespace LiveStream
 {
     public class SourceFactory
     {
-        public ISource CreateSource(CmdArgs cmdArgs)
+        public static ISource CreateSource(CmdArgs cmdArgs)
         {
             if (cmdArgs.IsSourceHttp)
             {

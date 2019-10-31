@@ -8,10 +8,10 @@ namespace LiveStream
     {
         private int fileId = 0;
         private readonly Guid sequence;
-        private readonly IConnection connection;
+        private readonly IReadOnlyConnection connection;
         private readonly List<WorkChunk> workChunks = new List<WorkChunk>();
 
-        public ConnectionWrapper(IConnection connection)
+        public ConnectionWrapper(IReadOnlyConnection connection)
         {
             this.connection = connection;
             
@@ -25,20 +25,22 @@ namespace LiveStream
             if (workChunk == null)
             {
                 var chunkFileId = 0;
-                var receiverChunk = connection.MediaQueue.ReadBlocking(() =>
+                var receiverChunk = connection.ReadBlocking(() =>
                 {
                     chunkFileId = fileId;
                     fileId++;
                 });
 
                 workChunk = new WorkChunk(
-                    buffer: receiverChunk.Buffer, 
-                    length: receiverChunk.Length, 
+                    buffer: receiverChunk.Buffer,
+                    length: receiverChunk.Length,
                     fileId: chunkFileId,
-                    sequence: sequence,
-                    processed: false,
-                    retryAt: DateTime.Now.AddSeconds(1));
-                
+                    sequence: sequence)
+                {
+                    Processed = false,
+                    RetryAt = DateTime.Now.AddSeconds(1)
+                };
+
                 lock (workChunks)
                 {
                     workChunks.Add(workChunk);
@@ -77,7 +79,7 @@ namespace LiveStream
             }
         }
         
-        public int SourceCount => connection.MediaQueue.Count;
+        public int SourceCount => connection.Size;
         
         public int WorkCount => workChunks.Count;
     }

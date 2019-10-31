@@ -2,12 +2,14 @@ using System;
 
 namespace LiveStream
 {
-    public class Distributor
+    public class Distributor : IDistributor
     {
+        private const int MaxQueueSize = 1000;
         private readonly Logger<Distributor> logger = new Logger<Distributor>();
-        
-        public void DistributionLoop(MediaQueue source, ConnectionManager connectionManager)
+
+        public void DistributionLoop(MediaQueue source, ConnectionManager connectionManager, Buffer buffer)
         {
+            var maxConnectionSize = MaxQueueSize + buffer.Size;
             while (true)
             {
                 var chunk = source.ReadBlocking();
@@ -16,21 +18,32 @@ namespace LiveStream
                 {
                     try
                     {
-                        var queue = connection.MediaQueue;
-
-                        if (queue.Count > 1000)
+                        if (connection.Size > maxConnectionSize)
                         {
-                            queue.Clear();
+                            connection.Clear();
                             logger.Warning("Buffer overflow in connection");
                         }
-                        
-                        queue.Write(chunk);
+
+                        if (!connection.HasWrites && buffer.Size > 0)
+                        {
+                            var bufferChunks = buffer.GetChunks();
+                            foreach (var bufferChunk in bufferChunks)
+                            {
+                                connection.Write(bufferChunk);
+                            }
+                            logger.Info($"Fill connection with {bufferChunks.Count} blocks");
+                        }
+
+                        connection.Write(chunk);    
+
                     }
                     catch (Exception e)
                     {
                         logger.Error(e.Message);
                     }
                 }
+                                
+                buffer.Write(chunk);
             }
         }
     }

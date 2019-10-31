@@ -36,10 +36,13 @@ namespace LiveStream
             tcpClient.SendBufferSize = 64 * 1024;
             tcpClient.ReceiveBufferSize = 64 * 1024;
 
+            var endPoint = tcpClient.Client.RemoteEndPoint;
+            
             try
             {
                 using (var connection = connectionManager.CreateConnection())
                 {
+                    logger.Info($"Connection established {endPoint}");
                     var stream = tcpClient.GetStream();
 
                     var header = Encoding.UTF8.GetBytes(
@@ -49,18 +52,25 @@ namespace LiveStream
                                           + Environment.NewLine);
                     stream.Write(header, 0, header.Length);
 
+                    var counter = 0;
                     while (true)
                     {
-                        var chunk = connection.MediaQueue.ReadBlocking();
+                        counter++;
+                        var chunk = connection.ReadBlocking();
 
                         stream.WriteChunk(chunk);
+                        if (counter == 50)
+                        {
+                            logger.Info($"{endPoint}; Sent {chunk.Length} Bytes; Queue {connection.Size}");
+                            counter = 0;
+                        }
                     }
                 }
             }
             
             catch (Exception e)
             {
-                logger.Info($"Lost connection {tcpClient.Client.RemoteEndPoint}: {e.Message}");
+                logger.Info($"Connection lost {endPoint}: {e.Message}");
             }
         }
     }

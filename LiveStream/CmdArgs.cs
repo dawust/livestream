@@ -20,6 +20,8 @@ namespace LiveStream
 
         public int SinkHttpPort { get; set; }
 
+        public int SinkBufferSize { get; set; }
+        
         public bool IsSinkConsole { get; set; }
 
         public bool IsSinkM2Tcp { get; set; }

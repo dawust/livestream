@@ -49,13 +49,13 @@ namespace LiveStream
         private class M2TCPConnection : IM2TCPConnection
         {
             private readonly Logger<M2TCPConnection> logger = new Logger<M2TCPConnection>();
-            private readonly IConnection connection;
+            private readonly IReadOnlyConnection connection;
             private readonly Action destructorAction;
             private readonly ConnectionWrapper connectionWrapper;
             
             private int references = 0;
 
-            public M2TCPConnection(IConnection connection, Action destructorAction)
+            public M2TCPConnection(IReadOnlyConnection connection, Action destructorAction)
             {
                 this.connection = connection;
                 this.destructorAction = destructorAction;
@@ -71,7 +71,7 @@ namespace LiveStream
         
             public int WorkCount => connectionWrapper.WorkCount;
 
-            public IConnection Connection => connection;
+            public IReadOnlyConnection Connection => connection;
 
             public void Dispose() => destructorAction();
 

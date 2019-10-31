@@ -121,21 +121,18 @@ namespace LiveStream
 
                     while (true)
                     {
-                        var fileId = networkStream.ReadInt32();
-                        var length = networkStream.ReadInt32();
-                        var sequence = networkStream.ReadGuid();
-                        var buffer = networkStream.ReadExactly(length);
-
-                        var chunk = new Chunk(buffer, length);
+                        var chunk = networkStream.ReadWorkChunk();
 
                         lock (chunks)
                         {
-                            chunks[Tuple.Create(fileId, sequence)] = chunk;
-                            if (fileId == 0 && currentSequence != sequence)
+                            chunks[Tuple.Create(chunk.FileId, chunk.Sequence)] = chunk;
+                            if (chunk.FileId == 0 && currentSequence != chunk.Sequence)
                             {
-                                logger.Info($"Got new sequence {sequence}");
-                                currentSequence = sequence;
+                                currentSequence = chunk.Sequence;
                                 currentFileId = 0;
+                                
+                                logger.Info($"Got new sequence {currentSequence}");
+                                
                                 foreach (var chunkId in chunks.Select(c => c.Key)
                                     .Where(kvp => kvp.Item2 != currentSequence).ToList())
                                 {
@@ -146,8 +143,8 @@ namespace LiveStream
                             while (chunks.ContainsKey(Tuple.Create(currentFileId, currentSequence)))
                             {
                                 var nextChunk = chunks[Tuple.Create(currentFileId, currentSequence)];
-                                foreach (var chunkId in chunks.Select(c => c.Key)
-                                    .Where(kvp => kvp.Item1 < currentFileId && kvp.Item2 == currentSequence).ToList())
+                                foreach (var chunkId in chunks.Keys
+                                    .Where(k => k.Item1 < currentFileId && k.Item2 == currentSequence).ToList())
                                 {
                                     chunks.Remove(chunkId);
                                 }

@@ -9,6 +9,7 @@ namespace LiveStream
     {
         private readonly Logger<UdpSource> logger = new Logger<UdpSource>();
         private readonly int udpPort;
+        
         public UdpSource(int udpPort)
         {
             this.udpPort = udpPort;

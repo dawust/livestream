@@ -2,19 +2,18 @@ using System;
 
 namespace LiveStream
 {
-    public class WorkChunk : IChunk
+    public class WorkChunk : IWorkChunk
     {
-        public WorkChunk(byte[] buffer, int length, int fileId, Guid sequence, bool processed, DateTime retryAt)
+        public WorkChunk(byte[] buffer, int length, int fileId, Guid sequence)
         {
             Buffer = buffer;
             Length = length;
             FileId = fileId;
             Sequence = sequence;
-            Processed = processed;
-            RetryAt = retryAt;
         }
 
         public byte[] Buffer { get; }
+        
         public int Length { get; }
 
         public int FileId { get; }

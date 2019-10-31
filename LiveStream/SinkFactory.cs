@@ -2,7 +2,7 @@ namespace LiveStream
 {
     public class SinkFactory
     {
-        public ISink CreateSink(CmdArgs cmdArgs)
+        public static ISink CreateSink(CmdArgs cmdArgs)
         {
             if (cmdArgs.IsSinkHttp)
             {

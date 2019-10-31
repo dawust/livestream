@@ -8,21 +8,20 @@ namespace LiveStream
     {
         private readonly Logger<ConnectionManager> logger = new Logger<ConnectionManager>();
         private readonly List<Connection> connections = new List<Connection>();
-        private IReadOnlyList<IConnection> connectionsClone = new List<IConnection>();
+        private volatile IReadOnlyList<Connection> connectionsClone = new List<Connection>();
 
-        public IConnection CreateConnection()
+        public IReadOnlyConnection CreateConnection()
         {            
-            var mediaQueue = new MediaQueue();
-            var connection = new Connection(mediaQueue, CloseDeadConnections);
+            var connection = new Connection(destructorAction: CloseDeadConnections);
             
             lock (connections)
             {
                 connections.Add(connection);
-                connectionsClone = connections.Select(c => (IConnection)c).ToList();
+                connectionsClone = connections.ToList();
             }
             
             var connectionCount = GetConnections().Count;
-            logger.Info($"New connection established, {connectionCount} connections");
+            logger.Info($"Connection established, {connectionCount} connections");
 
             return connection;
         }
@@ -32,7 +31,7 @@ namespace LiveStream
             lock (connections)
             {
                 connections.RemoveAll(c => !c.IsAlive);
-                connectionsClone = connections.Select(c => (IConnection)c).ToList();
+                connectionsClone = connections.ToList();
             }
             
             var connectionCount = GetConnections().Count;
@@ -46,23 +45,38 @@ namespace LiveStream
         
         private class Connection : IConnection
         {
-            private Action DestructorAction { get; }
             public bool IsAlive { get; private set; }
-            public MediaQueue MediaQueue { get; private set; }
+            
+            public bool HasWrites { get; private set; }
+            
+            private readonly Action destructorAction;
+
+            private readonly MediaQueue queue;
         
-            public Connection(MediaQueue mediaQueue, Action destructorAction)
+            public Connection(Action destructorAction)
             {
-                MediaQueue = mediaQueue;
+                queue = new MediaQueue();
+                this.destructorAction = destructorAction;
                 IsAlive = true;
-                DestructorAction = destructorAction;
             }
+
+            public void Write(IChunk chunk)
+            {
+                HasWrites = true;
+                queue.Write(chunk);
+            } 
+
+            public IChunk ReadBlocking(Action lockedAction = null) => queue.ReadBlocking(lockedAction);
+
+            public void Clear() => queue.Clear();
+
+            public int Size => queue.Count;
 
             public void Dispose()
             {
                 IsAlive = false;
-                DestructorAction();
-                MediaQueue.Clear();
-                MediaQueue = null;
+                destructorAction();
+                queue.Clear();
             }
         }
     }

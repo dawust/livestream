@@ -3,7 +3,7 @@ using System.Threading;
 
 namespace LiveStream
 {
-    class Program
+    public class Program
     {
         public static void Main(string[] args)
         {
@@ -26,6 +26,7 @@ namespace LiveStream
                 {"url=", v => cmdArgs.HttpUri = v},
                 {"sinkhttp", v => cmdArgs.IsSinkHttp = v != null},
                 {"sinkhttpport=", (int v) => cmdArgs.SinkHttpPort = v},
+                {"sinkbuffer=", (int v) => cmdArgs.SinkBufferSize = v},
                 {"sinkconsole", v => cmdArgs.IsSinkConsole = v != null},
                 {"sinkm2tcp", v => cmdArgs.IsSinkM2Tcp = v != null},
                 {"sinkm2tcpport=", (int v) => cmdArgs.SinkM2TcpPort = v},
@@ -54,18 +55,20 @@ namespace LiveStream
 
             var mediaQueue = new MediaQueue();
             var connectionManager = new ConnectionManager();
-            var source = new SourceFactory().CreateSource(cmdArgs);
-            var sink = new SinkFactory().CreateSink(cmdArgs);    
-                
+            
+            var source = SourceFactory.CreateSource(cmdArgs);
+            var sink = SinkFactory.CreateSink(cmdArgs);
+            var buffer = new Buffer(cmdArgs.SinkBufferSize);
+            
             new Thread(() => source.SourceLoop(mediaQueue)).Start();
             new Thread(() => sink.SinkLoop(connectionManager)).Start();
             
-            new Distributor().DistributionLoop(mediaQueue, connectionManager);            
+            new Distributor().DistributionLoop(mediaQueue, connectionManager, buffer);            
         }
 
         private static void DisplayHelp(CmdArgs cmdArgs)
         {
-            Console.WriteLine("Streaming Magic TCP 0.7");
+            Console.WriteLine("Streaming Magic TCP 0.71");
             Console.WriteLine("Sources");
             Console.WriteLine("--udp          | UDP Source (default) : ");
             Console.WriteLine("--port         | UDP Port             : " + cmdArgs.UdpPort);
@@ -80,6 +83,8 @@ namespace LiveStream
             Console.WriteLine("");
             Console.WriteLine("");
             Console.WriteLine("Sinks");
+            Console.WriteLine("--sinkbuffer   | Packet buffer        : " + cmdArgs.SinkBufferSize);
+            Console.WriteLine("");
             Console.WriteLine("--sinkhttp     | HTTP Sink            : " + cmdArgs.IsSinkHttp);
             Console.WriteLine("--sinkhttpport | HTTP Port            : " + cmdArgs.SinkHttpPort);
             Console.WriteLine("");

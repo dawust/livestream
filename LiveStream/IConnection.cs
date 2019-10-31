@@ -1,9 +1,11 @@
-using System;
-
 namespace LiveStream
 {
-    public interface IConnection : IDisposable
+    public interface IConnection : IReadOnlyConnection
     {
-        MediaQueue MediaQueue { get; }
+        bool HasWrites { get; }
+        
+        void Write(IChunk chunk);
+
+        void Clear();
     }
 }
