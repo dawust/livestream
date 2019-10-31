@@ -8,7 +8,7 @@ namespace LiveStream
     {
         private readonly Logger<ConnectionManager> logger = new Logger<ConnectionManager>();
         private readonly List<Connection> connections = new List<Connection>();
-        private volatile IReadOnlyList<Connection> connectionsClone = new List<Connection>();
+        private volatile IReadOnlyList<IConnection> connectionsClone = new List<IConnection>();
 
         public IReadOnlyConnection CreateConnection()
         {            

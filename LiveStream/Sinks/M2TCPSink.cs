@@ -106,6 +106,13 @@ namespace LiveStream
             catch (Exception e)
             {
                 logger.Warning($"Lost connection {tcpClient.Client.RemoteEndPoint}: {e.Message}");
+                try
+                {
+                    tcpClient.Close();
+                }
+                catch
+                {
+                }
             }
         }
     }
