@@ -21,6 +21,11 @@ namespace LiveStream
                 return;
             }
             
+            if (chunk.IsStreamReset)
+            {
+                queue.Clear();
+            }
+            
             if (queue.Count == maxSize)
             {
                 queue.Dequeue();

@@ -6,7 +6,7 @@ namespace LiveStream
         {
             if (cmdArgs.IsSinkHttp)
             {
-                return new HttpSink(cmdArgs.SinkHttpPort);
+                return new HttpSink(cmdArgs.SinkHttpPort, cmdArgs.SinkBufferSize);
             }
 
             if (cmdArgs.IsSinkConsole)

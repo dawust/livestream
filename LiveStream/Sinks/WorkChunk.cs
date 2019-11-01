@@ -4,12 +4,13 @@ namespace LiveStream
 {
     public class WorkChunk : IWorkChunk
     {
-        public WorkChunk(byte[] buffer, int length, int fileId, Guid sequence)
+        public WorkChunk(byte[] buffer, int length, int fileId, Guid sequence, bool isStreamReset)
         {
             Buffer = buffer;
             Length = length;
             FileId = fileId;
             Sequence = sequence;
+            IsStreamReset = isStreamReset;
         }
 
         public byte[] Buffer { get; }
@@ -20,8 +21,12 @@ namespace LiveStream
 
         public Guid Sequence { get; }
         
+        public bool IsStreamReset { get; }
+        
         public bool Processed { get; set; }
         
         public DateTime RetryAt { get; set; }
+
+        
     }
 }

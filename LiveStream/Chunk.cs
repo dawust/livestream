@@ -10,5 +10,7 @@
 
         public byte[] Buffer { get; }
         public int Length { get; }
+        
+        public bool IsStreamReset => false;
     }
 }

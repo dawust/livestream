@@ -35,7 +35,8 @@ namespace LiveStream
                     buffer: receiverChunk.Buffer,
                     length: receiverChunk.Length,
                     fileId: chunkFileId,
-                    sequence: sequence)
+                    sequence: sequence,
+                    isStreamReset: receiverChunk.IsStreamReset)
                 {
                     Processed = false,
                     RetryAt = DateTime.Now.AddSeconds(1)

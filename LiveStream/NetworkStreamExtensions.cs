@@ -29,16 +29,6 @@ namespace LiveStream
         {
             stream.Write(guid.ToByteArray(), 0, 16);
         }
-
-        public static IWorkChunk ReadWorkChunk(this Stream stream)
-        {
-            var fileId = stream.ReadInt32();
-            var length = stream.ReadInt32();
-            var sequence = stream.ReadGuid();
-            var buffer = stream.ReadExactly(length);
-            
-            return new WorkChunk(buffer, length, fileId, sequence);
-        }
         
         public static int ReadInt32(this Stream stream)
         {
@@ -54,7 +44,7 @@ namespace LiveStream
             return new Guid(buffer);
         }
 
-        private static byte[] ReadExactly(this Stream stream, int size)
+        public static byte[] ReadExactly(this Stream stream, int size)
         {
             var buffer = new byte[size];
             var receivedLength = 0;

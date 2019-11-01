@@ -124,12 +124,18 @@ namespace LiveStream
 
                         while (true)
                         {
-                            var chunk = networkStream.ReadWorkChunk();
-
+                            var fileId = networkStream.ReadInt32();
+                            var length = networkStream.ReadInt32();
+                            var sequence = networkStream.ReadGuid();
+                            var buffer = networkStream.ReadExactly(length);
+            
+                            var isStreamReset = fileId == 0 && currentSequence != sequence;
+                            var chunk = new WorkChunk(buffer, length, fileId, sequence, isStreamReset);
+                            
                             lock (chunks)
                             {
                                 chunks[Tuple.Create(chunk.FileId, chunk.Sequence)] = chunk;
-                                if (chunk.FileId == 0 && currentSequence != chunk.Sequence)
+                                if (isStreamReset)
                                 {
                                     currentSequence = chunk.Sequence;
                                     currentFileId = 0;

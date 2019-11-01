@@ -2,7 +2,7 @@ using System;
 
 namespace LiveStream
 {
-    public class Distributor : IDistributor
+    public class Distributor
     {
         private const int MaxQueueSize = 1000;
         private readonly Logger<Distributor> logger = new Logger<Distributor>();

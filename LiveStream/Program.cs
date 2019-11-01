@@ -8,14 +8,14 @@ namespace LiveStream
         public static void Main(string[] args)
         {
             var logger = new Logger<Program>();
-        
+
             System.Net.ServicePointManager.DefaultConnectionLimit = 50;
             System.Net.ServicePointManager.MaxServicePoints = 50;
 
             var cmdArgs = new CmdArgs
             {
                 SinkM2TcpPort = 13999,
-                UdpPort = 1236, 
+                UdpPort = 1236,
                 M2TcpConnections = 30
             };
 
@@ -50,25 +50,25 @@ namespace LiveStream
             {
                 DisplayHelp(cmdArgs);
             }
-            
+
             Thread.CurrentThread.Priority = ThreadPriority.Highest;
 
             var mediaQueue = new MediaQueue();
             var connectionManager = new ConnectionManager();
-            
+
             var source = SourceFactory.CreateSource(cmdArgs);
             var sink = SinkFactory.CreateSink(cmdArgs);
             var buffer = new Buffer(cmdArgs.SinkBufferSize);
-            
+
             new Thread(() => source.SourceLoop(mediaQueue)).Start();
             new Thread(() => sink.SinkLoop(connectionManager)).Start();
-            
-            new Distributor().DistributionLoop(mediaQueue, connectionManager, buffer);            
+
+            new Distributor().DistributionLoop(mediaQueue, connectionManager, buffer);
         }
 
         private static void DisplayHelp(CmdArgs cmdArgs)
         {
-            Console.WriteLine("Streaming Magic TCP 0.71");
+            Console.WriteLine("Streaming Magic TCP 0.72");
             Console.WriteLine("Sources");
             Console.WriteLine("--udp          | UDP Source (default) : ");
             Console.WriteLine("--port         | UDP Port             : " + cmdArgs.UdpPort);
