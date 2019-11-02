@@ -2,7 +2,7 @@
 using System.Net;
 using System.Threading;
 
-namespace LiveStream
+namespace LiveStream.Sources
 {
     class HttpSource : ISource
     {
@@ -32,7 +32,13 @@ namespace LiveStream
                         var receivedLength = 0;
                         while (receivedLength < ReceiveSize * 2)
                         {
-                            receivedLength += responseStream.Read(buffer, receivedLength, ReceiveSize);
+                            var length = responseStream.Read(buffer, receivedLength, ReceiveSize);
+                            if (length == 0)
+                            {
+                                throw new Exception("Socket was closed, returned 0 bytes");
+                            }
+                
+                            receivedLength += length;
                         }
 
                         var chunk = new Chunk(buffer, receivedLength);

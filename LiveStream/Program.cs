@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using Buffer = LiveStream.Distributor.Buffer;
 
 namespace LiveStream
 {
@@ -30,10 +31,11 @@ namespace LiveStream
                 {"sinkconsole", v => cmdArgs.IsSinkConsole = v != null},
                 {"sinkm2tcp", v => cmdArgs.IsSinkM2Tcp = v != null},
                 {"sinkm2tcpport=", (int v) => cmdArgs.SinkM2TcpPort = v},
-                {"m2tcp", v => cmdArgs.IsSourceM2tcp = v != null},
+                {"m2tcp", v => cmdArgs.IsSourceM2Tcp = v != null},
                 {"m2tcphost=", v => cmdArgs.M2TcpHost = v},
                 {"m2tcpport=", (int v) => cmdArgs.M2TcpPort = v},
-                {"m2tcpconn=", (int v) => cmdArgs.M2TcpConnections = v}
+                {"m2tcpconn=", (int v) => cmdArgs.M2TcpConnections = v},
+                {"m2tcpreset", v => cmdArgs.M2TcpResetPackets = v != null}
             };
 
             try
@@ -63,12 +65,12 @@ namespace LiveStream
             new Thread(() => source.SourceLoop(mediaQueue)).Start();
             new Thread(() => sink.SinkLoop(connectionManager)).Start();
 
-            new Distributor().DistributionLoop(mediaQueue, connectionManager, buffer);
+            new Distributor.Distributor().DistributionLoop(mediaQueue, connectionManager, buffer);
         }
 
         private static void DisplayHelp(CmdArgs cmdArgs)
         {
-            Console.WriteLine("Streaming Magic TCP 0.72");
+            Console.WriteLine("Streaming Magic TCP 0.74");
             Console.WriteLine("Sources");
             Console.WriteLine("--udp          | UDP Source (default) : ");
             Console.WriteLine("--port         | UDP Port             : " + cmdArgs.UdpPort);
@@ -76,10 +78,11 @@ namespace LiveStream
             Console.WriteLine("--http         | HTTP Source          : " + cmdArgs.IsSourceHttp);
             Console.WriteLine("--url          | HTTP URL             : " + cmdArgs.HttpUri);
             Console.WriteLine("");
-            Console.WriteLine("--m2tcp        | M2TCP Source         : " + cmdArgs.IsSourceM2tcp);
+            Console.WriteLine("--m2tcp        | M2TCP Source         : " + cmdArgs.IsSourceM2Tcp);
             Console.WriteLine("--m2tcphost    | M2TCP Host           : " + cmdArgs.M2TcpHost);
             Console.WriteLine("--m2tcpport    | M2TCP Port           : " + cmdArgs.M2TcpPort);
             Console.WriteLine("--m2tcpconn    | M2TCP Connections    : " + cmdArgs.M2TcpConnections);
+            Console.WriteLine("--m2tcpreset   | M2TCP Send reset pck.: " + cmdArgs.M2TcpResetPackets);
             Console.WriteLine("");
             Console.WriteLine("");
             Console.WriteLine("Sinks");

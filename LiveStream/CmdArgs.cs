@@ -8,13 +8,15 @@ namespace LiveStream
 
         public string HttpUri { get; set; }
         
-        public bool IsSourceM2tcp { get; set; }
+        public bool IsSourceM2Tcp { get; set; }
         
         public string M2TcpHost { get; set; }
         
         public int M2TcpPort { get; set; }
         
         public int M2TcpConnections { get; set; }
+        
+        public bool M2TcpResetPackets { get; set; }
 
         public bool IsSinkHttp { get; set; }
 

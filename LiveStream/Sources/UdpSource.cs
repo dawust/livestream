@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
 
-namespace LiveStream
+namespace LiveStream.Sources
 {
     class UdpSource : ISource
     {

@@ -1,4 +1,4 @@
-﻿namespace LiveStream
+﻿namespace LiveStream.Sources
 {
     public interface ISource
     {

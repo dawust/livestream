@@ -1,7 +1,6 @@
 using System;
-using System.Threading;
 
-namespace LiveStream
+namespace LiveStream.Sinks
 {
     public class ConsoleWriterSink : ISink
     {

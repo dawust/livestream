@@ -3,9 +3,9 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
-namespace LiveStream
+namespace LiveStream.Sinks
 {
-    public class M2TCPSink : ISink
+    public class M2TcpSink : ISink
     {
         public const int ReceiveRequeueThreadMagicNumber = 113371;
         public const int ReceiveOnlyThreadMagicNumber = 213371;
@@ -14,18 +14,18 @@ namespace LiveStream
         public const int LastIdMagicNumber = 1337;
         public const int SingleIdMagicNumber = 31337;
      
-        private readonly Logger<M2TCPSink> logger = new Logger<M2TCPSink>();
+        private readonly Logger<M2TcpSink> logger = new Logger<M2TcpSink>();
         private readonly TcpListener listener;
-        private M2TCPConnectionManager m2TcpConnectionManager;
+        private M2TcpConnectionManager m2TcpConnectionManager;
 
-        public M2TCPSink(int port)
+        public M2TcpSink(int port)
         {
             listener = new TcpListener(IPAddress.Any, port);
         }
 
         public void SinkLoop(IConnectionManager connectionManager)
         {
-            m2TcpConnectionManager = new M2TCPConnectionManager(connectionManager);
+            m2TcpConnectionManager = new M2TcpConnectionManager(connectionManager);
             listener.Start();
 
             while (true)

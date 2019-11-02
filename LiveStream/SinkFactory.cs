@@ -1,6 +1,8 @@
+using LiveStream.Sinks;
+
 namespace LiveStream
 {
-    public class SinkFactory
+    public static class SinkFactory
     {
         public static ISink CreateSink(CmdArgs cmdArgs)
         {
@@ -14,7 +16,7 @@ namespace LiveStream
                 return new ConsoleWriterSink();
             }
 
-            return new M2TCPSink(cmdArgs.SinkM2TcpPort);
+            return new M2TcpSink(cmdArgs.SinkM2TcpPort);
         }
     }
 }

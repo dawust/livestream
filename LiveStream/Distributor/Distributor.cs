@@ -1,6 +1,6 @@
 using System;
 
-namespace LiveStream
+namespace LiveStream.Distributor
 {
     public class Distributor
     {
@@ -34,8 +34,7 @@ namespace LiveStream
                             logger.Info($"Fill connection with {bufferChunks.Count} blocks");
                         }
 
-                        connection.Write(chunk);    
-
+                        connection.Write(chunk);
                     }
                     catch (Exception e)
                     {

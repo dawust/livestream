@@ -1,6 +1,8 @@
+using LiveStream.Sources;
+
 namespace LiveStream
 {
-    public class SourceFactory
+    public static class SourceFactory
     {
         public static ISource CreateSource(CmdArgs cmdArgs)
         {
@@ -9,9 +11,13 @@ namespace LiveStream
                 return new HttpSource(cmdArgs.HttpUri);
             }
 
-            if (cmdArgs.IsSourceM2tcp)
+            if (cmdArgs.IsSourceM2Tcp)
             {
-                return new M2TCPSource(cmdArgs.M2TcpHost, cmdArgs.M2TcpPort, cmdArgs.M2TcpConnections);
+                return new M2TcpSource(
+                    hostname: cmdArgs.M2TcpHost, 
+                    port: cmdArgs.M2TcpPort, 
+                    connections: cmdArgs.M2TcpConnections, 
+                    sendResetPackets: cmdArgs.M2TcpResetPackets);
             }
             
             return new UdpSource(cmdArgs.UdpPort);

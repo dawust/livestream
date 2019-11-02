@@ -3,28 +3,31 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
+using LiveStream.Sinks;
 
-namespace LiveStream
+namespace LiveStream.Sources
 {
-    public class M2TCPSource : ISource
+    public class M2TcpSource : ISource
     {
-        private readonly Logger<M2TCPSource> logger = new Logger<M2TCPSource>();
-        private readonly IDictionary<Tuple<int, Guid>, IChunk> chunks = new Dictionary<Tuple<int, Guid>, IChunk>();
+        private readonly Logger<M2TcpSource> logger = new Logger<M2TcpSource>();
+        private readonly IDictionary<(int FileId, Guid Guid), IChunk> chunks = new Dictionary<(int FileId, Guid Guid), IChunk>();
 
         private readonly string hostname;
         private readonly int port;
         private readonly int connections;
         private readonly Guid connectionId;
+        private readonly bool sendResetPackets;
 
         private MediaQueue queue;
         private int currentFileId;
         private Guid currentSequence;
 
-        public M2TCPSource(string hostname, int port, int connections)
+        public M2TcpSource(string hostname, int port, int connections, bool sendResetPackets)
         {
             this.hostname = hostname;
             this.port = port;
             this.connections = connections;
+            this.sendResetPackets = sendResetPackets;
             this.connectionId = Guid.NewGuid();
         }
 
@@ -64,30 +67,30 @@ namespace LiveStream
                     tcpClient.NoDelay = true;
                     var networkStream = tcpClient.GetStream();
 
-                    networkStream.WriteInt32(M2TCPSink.ControlThreadMagicNumber);
+                    networkStream.WriteInt32(M2TcpSink.ControlThreadMagicNumber);
                     networkStream.WriteGuid(connectionId);
 
                     while (true)
                     {
-                        IReadOnlyList<Tuple<int, Guid>> chunkIds;
+                        IReadOnlyList<(int FileId, Guid Guid)> chunkIds;
                         int lastCheckedFileId;
                         Guid lastCheckedSequence;
 
                         lock (chunks)
                         {
-                            chunkIds = chunks.Select(c => c.Key).ToList();
+                            chunkIds = chunks.Keys.ToList();
                             lastCheckedFileId = currentFileId;
                             lastCheckedSequence = currentSequence;
                         }
 
                         foreach (var chunkId in chunkIds)
                         {
-                            networkStream.WriteInt32(M2TCPSink.SingleIdMagicNumber);
+                            networkStream.WriteInt32(M2TcpSink.SingleIdMagicNumber);
                             networkStream.WriteInt32(chunkId.Item1);
                             networkStream.WriteGuid(chunkId.Item2);
                         }
 
-                        networkStream.WriteInt32(M2TCPSink.LastIdMagicNumber);
+                        networkStream.WriteInt32(M2TcpSink.LastIdMagicNumber);
                         networkStream.WriteInt32(lastCheckedFileId);
                         networkStream.WriteGuid(lastCheckedSequence);
                         Thread.Sleep(100);
@@ -118,8 +121,8 @@ namespace LiveStream
                         var lastCheck = DateTime.Now;
 
                         networkStream.WriteInt32(shouldRequeue
-                            ? M2TCPSink.ReceiveRequeueThreadMagicNumber
-                            : M2TCPSink.ReceiveOnlyThreadMagicNumber);
+                            ? M2TcpSink.ReceiveRequeueThreadMagicNumber
+                            : M2TcpSink.ReceiveOnlyThreadMagicNumber);
                         networkStream.WriteGuid(connectionId);
 
                         while (true)
@@ -130,11 +133,16 @@ namespace LiveStream
                             var buffer = networkStream.ReadExactly(length);
             
                             var isStreamReset = fileId == 0 && currentSequence != sequence;
-                            var chunk = new WorkChunk(buffer, length, fileId, sequence, isStreamReset);
+                            var chunk = new WorkChunk(
+                                buffer: buffer, 
+                                length: length, 
+                                fileId: fileId, 
+                                sequence: sequence, 
+                                isStreamReset: isStreamReset && sendResetPackets);
                             
                             lock (chunks)
                             {
-                                chunks[Tuple.Create(chunk.FileId, chunk.Sequence)] = chunk;
+                                chunks[(chunk.FileId, chunk.Sequence)] = chunk;
                                 if (isStreamReset)
                                 {
                                     currentSequence = chunk.Sequence;
@@ -143,25 +151,26 @@ namespace LiveStream
                                     logger.Info($"Got new sequence {currentSequence}");
 
                                     foreach (var chunkId in chunks.Select(c => c.Key)
-                                        .Where(kvp => kvp.Item2 != currentSequence).ToList())
+                                        .Where(kvp => kvp.Guid != currentSequence).ToList())
                                     {
                                         chunks.Remove(chunkId);
                                     }
                                 }
 
-                                while (chunks.ContainsKey(Tuple.Create(currentFileId, currentSequence)))
+                                while (chunks.ContainsKey((currentFileId, currentSequence)))
                                 {
-                                    var nextChunk = chunks[Tuple.Create(currentFileId, currentSequence)];
-                                    foreach (var chunkId in chunks.Keys
-                                        .Where(k => k.Item1 < currentFileId && k.Item2 == currentSequence).ToList())
-                                    {
-                                        chunks.Remove(chunkId);
-                                    }
+                                    var nextChunk = chunks[(currentFileId, currentSequence)];
 
                                     queue.Write(nextChunk);
                                     currentFileId++;
                                     lastCheckedId = currentFileId;
                                     lastCheck = DateTime.Now;
+                                }
+                                
+                                foreach (var chunkId in chunks.Keys
+                                    .Where(k => k.FileId < currentFileId && k.Guid == currentSequence).ToList())
+                                {
+                                    chunks.Remove(chunkId);
                                 }
 
                                 if (lastCheckedId == currentFileId && lastCheck.AddSeconds(1) < DateTime.Now)

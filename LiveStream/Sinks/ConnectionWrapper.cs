@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace LiveStream
+namespace LiveStream.Sinks
 {
     public class ConnectionWrapper
     {

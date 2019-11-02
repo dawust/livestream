@@ -1,4 +1,4 @@
-namespace LiveStream
+namespace LiveStream.Sinks
 {
     public interface ISink
     {

@@ -4,7 +4,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
-namespace LiveStream
+namespace LiveStream.Sinks
 {
     public class HttpSink : ISink
     {
@@ -90,7 +90,6 @@ namespace LiveStream
                     }
                 }
             }
-            
             catch (Exception e)
             {
                 logger.Info($"Connection lost {endPoint}: {e.Message}");

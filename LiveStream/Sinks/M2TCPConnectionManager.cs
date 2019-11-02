@@ -1,27 +1,27 @@
 using System;
 using System.Collections.Generic;
 
-namespace LiveStream
+namespace LiveStream.Sinks
 {
-    public class M2TCPConnectionManager
+    public class M2TcpConnectionManager
     {
-        private readonly IDictionary<Guid, M2TCPConnection> m2TcpConnections = new Dictionary<Guid, M2TCPConnection>();
+        private readonly IDictionary<Guid, M2TcpConnection> m2TcpConnections = new Dictionary<Guid, M2TcpConnection>();
 
         private readonly IConnectionManager connectionManager;
 
-        public M2TCPConnectionManager(IConnectionManager connectionManager)
+        public M2TcpConnectionManager(IConnectionManager connectionManager)
         {
             this.connectionManager = connectionManager;
         }
         
-        public IM2TCPConnection GetOrCreateConnection(Guid connectionId)
+        public IM2TcpConnection GetOrCreateConnection(Guid connectionId)
         {
             lock (m2TcpConnections)
             {
                 if (!m2TcpConnections.ContainsKey(connectionId))
                 {
                     var connection = connectionManager.CreateConnection();
-                    m2TcpConnections[connectionId] = new M2TCPConnection(connection, () => CloseConnection(connectionId));
+                    m2TcpConnections[connectionId] = new M2TcpConnection(connection, () => CloseConnection(connectionId));
                 }
 
                 var m2TcpConnection = m2TcpConnections[connectionId];
@@ -46,16 +46,15 @@ namespace LiveStream
             }
         }
         
-        private class M2TCPConnection : IM2TCPConnection
+        private class M2TcpConnection : IM2TcpConnection
         {
-            private readonly Logger<M2TCPConnection> logger = new Logger<M2TCPConnection>();
             private readonly IReadOnlyConnection connection;
             private readonly Action destructorAction;
             private readonly ConnectionWrapper connectionWrapper;
             
             private int references = 0;
 
-            public M2TCPConnection(IReadOnlyConnection connection, Action destructorAction)
+            public M2TcpConnection(IReadOnlyConnection connection, Action destructorAction)
             {
                 this.connection = connection;
                 this.destructorAction = destructorAction;
@@ -79,15 +78,7 @@ namespace LiveStream
 
             public void RemoveReference() => references--;
 
-            public bool HasNoReferences()
-            {
-                if (references < 0)
-                {
-                    logger.Error("Less than 0 references");
-                }
-                
-                return references <= 0;
-            }
+            public bool HasNoReferences() => references == 0;
         }
     }
 }

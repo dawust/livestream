@@ -1,8 +1,8 @@
 using System;
 
-namespace LiveStream
+namespace LiveStream.Sinks
 {
-    public interface IM2TCPConnection : IDisposable
+    public interface IM2TcpConnection : IDisposable
     {
         WorkChunk GetNextWorkChunk(bool considerRetryQueue);
 

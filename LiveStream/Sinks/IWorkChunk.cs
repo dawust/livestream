@@ -1,6 +1,6 @@
 using System;
 
-namespace LiveStream
+namespace LiveStream.Sinks
 {
     public interface IWorkChunk : IChunk
     {
