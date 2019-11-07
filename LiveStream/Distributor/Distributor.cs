@@ -20,7 +20,7 @@ namespace LiveStream.Distributor
                     {
                         if (connection.Size > maxConnectionSize)
                         {
-                            connection.Clear();
+                            connection.Dispose();
                             logger.Warning("Buffer overflow in connection");
                         }
 

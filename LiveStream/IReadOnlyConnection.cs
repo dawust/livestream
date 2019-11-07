@@ -6,6 +6,8 @@ namespace LiveStream
     {
         IChunk ReadBlocking(Action lockedAction = null);
 
+        IChunk ReadBlockingOrNull(int millisecondsTimeout);
+
         int Size { get; }
     }
 }

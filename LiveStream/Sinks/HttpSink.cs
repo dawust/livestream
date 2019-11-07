@@ -8,16 +8,17 @@ namespace LiveStream.Sinks
 {
     public class HttpSink : ISink
     {
+        private const int MillisecondsTimeout = 15000;
         private readonly Logger<HttpSink> logger = new Logger<HttpSink>();
         private readonly TcpListener listener;
         private readonly int minBufferSize;
-        
+
         private IConnectionManager connectionManager;
 
         public HttpSink(int port, int minBufferSize)
         {
             this.minBufferSize = minBufferSize;
-            listener = new TcpListener(IPAddress.Any, port);
+            listener = TcpListener.Create(port);
         }
 
         public void SinkLoop(IConnectionManager connectionManager)
@@ -28,19 +29,20 @@ namespace LiveStream.Sinks
             while (true)
             {
                 var client = listener.AcceptTcpClient();
-                var thread = new Thread(Listen);
-                thread.Start(client);
+                var thread = new Thread(() => Listen(client));
+                thread.Start();
             }
         }
 
-        private void Listen(object o)
+        private void Listen(TcpClient tcpClient)
         {
-            var tcpClient = (TcpClient) o;
             tcpClient.SendBufferSize = 64 * 1024;
             tcpClient.ReceiveBufferSize = 64 * 1024;
+            tcpClient.SendTimeout = MillisecondsTimeout;
+            tcpClient.ReceiveTimeout = MillisecondsTimeout;
 
             var endPoint = tcpClient.Client.RemoteEndPoint;
-            
+
             try
             {
                 using (var connection = connectionManager.CreateConnection())
@@ -56,20 +58,28 @@ namespace LiveStream.Sinks
                                           + Environment.NewLine);
                     stream.Write(header, 0, header.Length);
 
+                    var timeoutTime = DateTime.Now.AddMilliseconds(MillisecondsTimeout);
                     while (connection.Size < minBufferSize)
                     {
                         Thread.Sleep(100);
+                        if (DateTime.Now > timeoutTime)
+                        {
+                            tcpClient.Client.Disconnect(false);
+                            stream.Close();
+                            tcpClient.Close();
+                            return;
+                        }
                     }
-                    
+
                     var counter = 0;
                     var firstChunk = true;
-                    
+
                     while (true)
                     {
                         counter++;
-                        var chunk = connection.ReadBlocking();
+                        var chunk = connection.ReadBlockingOrNull(MillisecondsTimeout);
 
-                        if (!firstChunk && chunk.IsStreamReset)
+                        if (chunk == null || (!firstChunk && chunk.IsStreamReset))
                         {
                             logger.Info($"{endPoint}; Stream reset, close connection");
                             tcpClient.Client.Disconnect(false);
@@ -80,19 +90,20 @@ namespace LiveStream.Sinks
 
                         stream.WriteChunk(chunk);
                         firstChunk = false;
-                        
+
                         if (counter == 50)
                         {
                             logger.Info($"{endPoint}; Sent {chunk.Length} Bytes; Queue {connection.Size}");
                             counter = 0;
                         }
-                        
                     }
                 }
             }
             catch (Exception e)
             {
                 logger.Info($"Connection lost {endPoint}: {e.Message}");
+                tcpClient.Client?.Disconnect(false);
+                tcpClient.Close();
             }
         }
     }

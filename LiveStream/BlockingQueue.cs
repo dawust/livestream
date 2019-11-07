@@ -65,5 +65,27 @@ namespace LiveStream
                 return item;
             }
         }
+        
+        public T DequeueOrNull(int millisecondsTimeout)
+        {
+            lock (queue)
+            {
+                while (queue.Count == 0)
+                {
+                    var lockAcquired = Monitor.Wait(queue, millisecondsTimeout);
+                    if (!lockAcquired)
+                    {
+                        return null;
+                    }
+                }
+
+                var item = queue.First.Value;
+                queue.RemoveFirst();
+
+                Monitor.PulseAll(queue);
+
+                return item;
+            }
+        }
     }
 }

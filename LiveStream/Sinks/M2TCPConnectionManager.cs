@@ -62,7 +62,7 @@ namespace LiveStream.Sinks
                 connectionWrapper = new ConnectionWrapper(connection);
             }
         
-            public WorkChunk GetNextWorkChunk(bool considerRetryQueue) => connectionWrapper.GetNextWorkChunk(considerRetryQueue);
+            public IWorkChunk GetNextWorkChunk(bool considerRetryQueue) => connectionWrapper.GetNextWorkChunk(considerRetryQueue);
 
             public void FinishWorkChunks(Func<WorkChunk, bool> filter) => connectionWrapper.FinishWorkChunks(filter);
 

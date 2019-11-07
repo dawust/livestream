@@ -5,7 +5,5 @@ namespace LiveStream
         bool HasWrites { get; }
         
         void Write(IChunk chunk);
-
-        void Clear();
     }
 }

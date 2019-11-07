@@ -70,7 +70,7 @@ namespace LiveStream
 
         private static void DisplayHelp(CmdArgs cmdArgs)
         {
-            Console.WriteLine("Streaming Magic TCP 0.74");
+            Console.WriteLine("Streaming Magic TCP 0.75");
             Console.WriteLine("Sources");
             Console.WriteLine("--udp          | UDP Source (default) : ");
             Console.WriteLine("--port         | UDP Port             : " + cmdArgs.UdpPort);
@@ -82,7 +82,7 @@ namespace LiveStream
             Console.WriteLine("--m2tcphost    | M2TCP Host           : " + cmdArgs.M2TcpHost);
             Console.WriteLine("--m2tcpport    | M2TCP Port           : " + cmdArgs.M2TcpPort);
             Console.WriteLine("--m2tcpconn    | M2TCP Connections    : " + cmdArgs.M2TcpConnections);
-            Console.WriteLine("--m2tcpreset   | M2TCP Send reset pck.: " + cmdArgs.M2TcpResetPackets);
+            Console.WriteLine("--m2tcpreset   | M2TCP Send reset pkt.: " + cmdArgs.M2TcpResetPackets);
             Console.WriteLine("");
             Console.WriteLine("");
             Console.WriteLine("Sinks");

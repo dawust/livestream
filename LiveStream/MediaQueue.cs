@@ -9,6 +9,8 @@ namespace LiveStream
         public void Write(IChunk chunk) => queue.Enqueue(chunk);
 
         public IChunk ReadBlocking(Action lockedAction = null) => queue.Dequeue(lockedAction);
+        
+        public IChunk ReadBlockingOrNull(int millisecondsTimeout) => queue.DequeueOrNull(millisecondsTimeout);
 
         public void Clear() => queue.Clear();
 

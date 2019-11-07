@@ -67,8 +67,8 @@ namespace LiveStream
             } 
 
             public IChunk ReadBlocking(Action lockedAction = null) => queue.ReadBlocking(lockedAction);
-
-            public void Clear() => queue.Clear();
+            
+            public IChunk ReadBlockingOrNull(int millisecondsTimeout) => queue.ReadBlockingOrNull(millisecondsTimeout);
 
             public int Size => queue.Count;
 

@@ -4,7 +4,7 @@ namespace LiveStream.Sinks
 {
     public interface IM2TcpConnection : IDisposable
     {
-        WorkChunk GetNextWorkChunk(bool considerRetryQueue);
+        IWorkChunk GetNextWorkChunk(bool considerRetryQueue);
 
         void FinishWorkChunks(Func<WorkChunk, bool> filter);
 

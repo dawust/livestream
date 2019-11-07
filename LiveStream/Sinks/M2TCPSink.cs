@@ -101,7 +101,6 @@ namespace LiveStream.Sinks
                 }
 
                 throw new Exception("Magic number did not match! Probably wrong protocol version!");
-                
             }
             catch (Exception e)
             {
