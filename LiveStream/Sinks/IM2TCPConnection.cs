@@ -1,12 +1,13 @@
 using System;
+using System.Threading.Tasks;
 
 namespace LiveStream.Sinks
 {
     public interface IM2TcpConnection : IDisposable
     {
-        IWorkChunk GetNextWorkChunk(bool considerRetryQueue);
+        Task<IWorkChunk> GetNextWorkChunkAsync(bool considerRetryQueue);
 
-        void FinishWorkChunks(Func<WorkChunk, bool> filter);
+        void FinishWorkChunks(Func<IWorkChunk, bool> filter);
 
         int SourceCount { get; }
         

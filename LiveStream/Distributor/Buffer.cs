@@ -1,44 +1,36 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace LiveStream.Distributor
+namespace LiveStream.Distributor;
+
+public class Buffer(int size)
 {
-    public class Buffer
+    private readonly Queue<IChunk> queue = new();
+
+    public void Write(IChunk chunk)
     {
-        private readonly Queue<IChunk> queue;
-        private readonly int maxSize;
-
-        public Buffer(int size)
+        if (size == 0)
         {
-            queue = new Queue<IChunk>();
-            maxSize = size;
+            return;
         }
-
-        public void Write(IChunk chunk)
+            
+        if (chunk.IsStreamReset)
         {
-            if (maxSize == 0)
-            {
-                return;
-            }
-            
-            if (chunk.IsStreamReset)
-            {
-                queue.Clear();
-            }
-            
-            if (queue.Count == maxSize)
-            {
-                queue.Dequeue();
-            }
-            
-            queue.Enqueue(chunk);
+            queue.Clear();
         }
-
-        public IReadOnlyList<IChunk> GetChunks()
+            
+        if (queue.Count == size)
         {
-            return queue.ToList();
+            queue.Dequeue();
         }
-
-        public int Size => maxSize;
+            
+        queue.Enqueue(chunk);
     }
+
+    public IReadOnlyList<IChunk> GetChunks()
+    {
+        return queue.ToList();
+    }
+
+    public int Size => size;
 }

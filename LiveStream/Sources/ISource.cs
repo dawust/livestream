@@ -1,7 +1,10 @@
-﻿namespace LiveStream.Sources
+﻿using System.Threading;
+using System.Threading.Tasks;
+
+namespace LiveStream.Sources
 {
     public interface ISource
     {
-        void SourceLoop(MediaQueue mediaQueue);
+        Task SourceLoopAsync(AsyncBlockingQueue<IChunk> mediaQueue, CancellationToken cancellationToken);
     }
 }

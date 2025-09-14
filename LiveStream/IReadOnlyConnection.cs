@@ -1,12 +1,13 @@
 using System;
+using System.Threading.Tasks;
 
 namespace LiveStream
 {
     public interface IReadOnlyConnection : IDisposable
     {
-        IChunk ReadBlocking(Action lockedAction = null);
+        Task<IChunk> ReadBlockingAsync();
 
-        IChunk ReadBlockingOrNull(int millisecondsTimeout);
+        Task<IChunk> ReadBlockingOrNullAsync(int millisecondsTimeout);
 
         int Size { get; }
     }

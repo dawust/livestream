@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Buffer = LiveStream.Distributor.Buffer;
 
 namespace LiveStream
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var logger = new Logger<Program>();
-
-            System.Net.ServicePointManager.DefaultConnectionLimit = 50;
-            System.Net.ServicePointManager.MaxServicePoints = 50;
 
             var cmdArgs = new CmdArgs
             {
@@ -53,24 +51,22 @@ namespace LiveStream
                 DisplayHelp(cmdArgs);
             }
 
-            Thread.CurrentThread.Priority = ThreadPriority.Highest;
-
-            var mediaQueue = new MediaQueue();
+            var mediaQueue = new AsyncBlockingQueue<IChunk>();
             var connectionManager = new ConnectionManager();
 
             var source = SourceFactory.CreateSource(cmdArgs);
             var sink = SinkFactory.CreateSink(cmdArgs);
             var buffer = new Buffer(cmdArgs.SinkBufferSize);
 
-            new Thread(() => source.SourceLoop(mediaQueue)).Start();
-            new Thread(() => sink.SinkLoop(connectionManager)).Start();
+            _ = Task.Run(() => source.SourceLoopAsync(mediaQueue, CancellationToken.None));
+            _ = Task.Run(() => sink.SinkLoopAsync(connectionManager, CancellationToken.None));
 
-            new Distributor.Distributor().DistributionLoop(mediaQueue, connectionManager, buffer);
+            await new Distributor.Distributor().DistributionLoopAsync(mediaQueue, connectionManager, buffer);
         }
 
         private static void DisplayHelp(CmdArgs cmdArgs)
         {
-            Console.WriteLine("Streaming Magic TCP 0.75");
+            Console.WriteLine("Streaming Magic TCP 0.80");
             Console.WriteLine("Sources");
             Console.WriteLine("--udp          | UDP Source (default) : ");
             Console.WriteLine("--port         | UDP Port             : " + cmdArgs.UdpPort);

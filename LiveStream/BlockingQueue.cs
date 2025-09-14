@@ -1,91 +1,73 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 
-namespace LiveStream
+namespace LiveStream;
+
+public class AsyncBlockingQueue<T> where T : class
 {
-    public class BlockingQueue<T> where T : class
+    private readonly Queue<T> queue = new();
+    private readonly SemaphoreSlim itemsAvailable = new(0);
+    private readonly Lock lockObject = new();
+
+    public void Clear()
     {
-        private readonly LinkedList<T> queue = new LinkedList<T>();
-
-        public void Clear()
+        lock (lockObject)
         {
-            lock (queue)
+            queue.Clear();
+
+            // Adjust semaphore count
+            while (itemsAvailable.CurrentCount > 0)
             {
-                queue.Clear();
+                itemsAvailable.Wait(0);
             }
         }
+    }
 
-        public int Count
+    public int Count
+    {
+        get
         {
-            get
+            lock (lockObject)
             {
-                int ret;
-                lock (queue)
-                {
-                    ret = queue.Count;
-                }
-
-                return ret;
+                return queue.Count;
             }
         }
+    }
 
-
-        public void Enqueue(T item)
+    public void Enqueue(T item)
+    {
+        lock (lockObject)
         {
-            lock (queue)
-            {
-                queue.AddLast(item);
-                if (queue.Count == 1)
-                {
-                    // wake up any blocked dequeue
-                    Monitor.PulseAll(queue);
-                }
-            }
+            queue.Enqueue(item);
         }
-        
-        public T Dequeue(Action lockedAction = null)
+
+        itemsAvailable.Release();
+    }
+
+    public async Task<T> DequeueAsync(CancellationToken cancellationToken = default)
+    {
+        await itemsAvailable.WaitAsync(cancellationToken);
+
+        lock (lockObject)
         {
-            lock (queue)
-            {
-                while (queue.Count == 0)
-                {
-                    Monitor.Wait(queue);
-                }
-
-                var item = queue.First.Value;
-                queue.RemoveFirst();
-                if (lockedAction != null)
-                {
-                    lockedAction();
-                }
-                
-                Monitor.PulseAll(queue);
-
-                return item;
-            }
+            return queue.Dequeue();
         }
-        
-        public T DequeueOrNull(int millisecondsTimeout)
+    }
+
+    public async Task<T> DequeueAsync(TimeSpan timeout, CancellationToken cancellationToken = default)
+    {
+        var acquired = await itemsAvailable.WaitAsync(timeout, cancellationToken);
+
+        if (!acquired)
         {
-            lock (queue)
-            {
-                while (queue.Count == 0)
-                {
-                    var lockAcquired = Monitor.Wait(queue, millisecondsTimeout);
-                    if (!lockAcquired)
-                    {
-                        return null;
-                    }
-                }
+            return null;
+        }
 
-                var item = queue.First.Value;
-                queue.RemoveFirst();
-
-                Monitor.PulseAll(queue);
-
-                return item;
-            }
+        lock (lockObject)
+        {
+            return queue.Dequeue();
         }
     }
 }

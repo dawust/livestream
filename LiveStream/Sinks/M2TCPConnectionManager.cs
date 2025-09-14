@@ -1,19 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace LiveStream.Sinks
 {
-    public class M2TcpConnectionManager
+    public class M2TcpConnectionManager(IConnectionManager connectionManager)
     {
         private readonly IDictionary<Guid, M2TcpConnection> m2TcpConnections = new Dictionary<Guid, M2TcpConnection>();
 
-        private readonly IConnectionManager connectionManager;
-
-        public M2TcpConnectionManager(IConnectionManager connectionManager)
-        {
-            this.connectionManager = connectionManager;
-        }
-        
         public IM2TcpConnection GetOrCreateConnection(Guid connectionId)
         {
             lock (m2TcpConnections)
@@ -46,25 +40,14 @@ namespace LiveStream.Sinks
             }
         }
         
-        private class M2TcpConnection : IM2TcpConnection
+        private class M2TcpConnection(IReadOnlyConnection connection, Action destructorAction) : IM2TcpConnection
         {
-            private readonly IReadOnlyConnection connection;
-            private readonly Action destructorAction;
-            private readonly ConnectionWrapper connectionWrapper;
+            private readonly ConnectionWrapper connectionWrapper = new(connection);
             
             private int references = 0;
+            public Task<IWorkChunk> GetNextWorkChunkAsync(bool considerRetryQueue) => connectionWrapper.GetNextWorkChunkAsync(considerRetryQueue);
 
-            public M2TcpConnection(IReadOnlyConnection connection, Action destructorAction)
-            {
-                this.connection = connection;
-                this.destructorAction = destructorAction;
-
-                connectionWrapper = new ConnectionWrapper(connection);
-            }
-        
-            public IWorkChunk GetNextWorkChunk(bool considerRetryQueue) => connectionWrapper.GetNextWorkChunk(considerRetryQueue);
-
-            public void FinishWorkChunks(Func<WorkChunk, bool> filter) => connectionWrapper.FinishWorkChunks(filter);
+            public void FinishWorkChunks(Func<IWorkChunk, bool> filter) => connectionWrapper.FinishWorkChunks(filter);
 
             public int SourceCount => connectionWrapper.SourceCount;
         

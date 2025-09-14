@@ -1,10 +1,12 @@
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace LiveStream.Sinks
 {
     public class ConsoleWriterSink : ISink
     {
-        public void SinkLoop(IConnectionManager connectionManager)
+        public async Task SinkLoopAsync(IConnectionManager connectionManager, CancellationToken cancellationToken)
         {
             var connection = connectionManager.CreateConnection();
             
@@ -12,8 +14,8 @@ namespace LiveStream.Sinks
             
             while (true)
             {
-                var chunk = connection.ReadBlocking();
-                console.WriteChunk(chunk);
+                var chunk = await connection.ReadBlockingAsync();
+                await console.WriteChunkAsync(chunk);
             }
         }
     }

@@ -26,7 +26,7 @@ namespace LiveStream
         
         private void Log(string text, Severity logLevel)
         {
-            Console.Error.WriteLine($"[{DateTime.Now.ToString()}][{logLevel}][{typeof(T).Name}]: {text}");
+            Console.Error.WriteLine($"[{DateTime.UtcNow.ToString()}][{logLevel}][{typeof(T).Name}]: {text}");
         }
         
         private enum Severity
