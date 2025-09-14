@@ -21,6 +21,7 @@ namespace LiveStream
             var optionSet = new OptionSet()
             {
                 {"http", v => cmdArgs.IsSourceHttp = v != null},
+                {"hls", v => cmdArgs.IsSourceHls = v != null},
                 {"port=", (int v) => cmdArgs.UdpPort = v},
                 {"url=", v => cmdArgs.HttpUri = v},
                 {"sinkhttp", v => cmdArgs.IsSinkHttp = v != null},
@@ -72,6 +73,7 @@ namespace LiveStream
             Console.WriteLine("--port         | UDP Port             : " + cmdArgs.UdpPort);
             Console.WriteLine("");
             Console.WriteLine("--http         | HTTP Source          : " + cmdArgs.IsSourceHttp);
+            Console.WriteLine("--hls          | HTTP IsHLS           : " + cmdArgs.IsSourceHls);
             Console.WriteLine("--url          | HTTP URL             : " + cmdArgs.HttpUri);
             Console.WriteLine("");
             Console.WriteLine("--m2tcp        | M2TCP Source         : " + cmdArgs.IsSourceM2Tcp);

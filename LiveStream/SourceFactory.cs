@@ -10,6 +10,11 @@ public static class SourceFactory
         {
             return new HttpSource(cmdArgs.HttpUri);
         }
+        
+        if (cmdArgs.IsSourceHls)
+        {
+            return new HlsSource(cmdArgs.HttpUri);
+        }
 
         if (cmdArgs.IsSourceM2Tcp)
         {

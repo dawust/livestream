@@ -10,6 +10,8 @@ namespace LiveStream
         
         public bool IsSourceM2Tcp { get; set; }
         
+        public bool IsSourceHls { get; set; }
+        
         public string M2TcpHost { get; set; }
         
         public int M2TcpPort { get; set; }
