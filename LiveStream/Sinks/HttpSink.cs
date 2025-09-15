@@ -67,7 +67,6 @@ public class HttpSink(int port, int minBufferSize) : ISink
 
             while (true)
             {
-                counter++;
                 var chunk = await connection.ReadBlockingOrNullAsync(MillisecondsTimeout);
 
                 if (chunk == null || (!firstChunk && chunk.IsStreamReset))
@@ -78,13 +77,15 @@ public class HttpSink(int port, int minBufferSize) : ISink
                     tcpClient.Close();
                     return;
                 }
+                
+                counter += chunk.Length;
 
                 await stream.WriteChunkAsync(chunk);
                 firstChunk = false;
 
-                if (counter == 50)
+                if (counter > 1024 * 1024)
                 {
-                    logger.Info($"{endPoint}; Sent {chunk.Length} Bytes; Queue {connection.Size}");
+                    logger.Info($"{endPoint}; Sent {counter} Bytes; Queue {connection.Size}");
                     counter = 0;
                 }
             }

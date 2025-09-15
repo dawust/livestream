@@ -15,6 +15,11 @@ public static class SourceFactory
         {
             return new HlsSource(cmdArgs.HttpUri);
         }
+        
+        if (cmdArgs.IsSourceQuic)
+        {
+            return new QuicSource(cmdArgs.SourceQuicHost, cmdArgs.SourceQuicPort);
+        }
 
         if (cmdArgs.IsSourceM2Tcp)
         {

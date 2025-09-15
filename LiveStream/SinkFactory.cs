@@ -11,6 +11,11 @@ public static class SinkFactory
             return new HttpSink(cmdArgs.SinkHttpPort, cmdArgs.SinkBufferSize);
         }
 
+        if (cmdArgs.IsSinkQuic)
+        {
+            return new QuicSink(cmdArgs.SinkQuicPort);
+        }
+        
         if (cmdArgs.IsSinkConsole)
         {
             return new ConsoleWriterSink();

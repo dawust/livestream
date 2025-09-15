@@ -8,6 +8,12 @@ namespace LiveStream
 
         public string HttpUri { get; set; }
         
+        public bool IsSourceQuic { get; set; }
+        
+        public string SourceQuicHost { get; set; }
+        
+        public int SourceQuicPort { get; set; }
+        
         public bool IsSourceM2Tcp { get; set; }
         
         public bool IsSourceHls { get; set; }
@@ -21,6 +27,10 @@ namespace LiveStream
         public bool M2TcpResetPackets { get; set; }
 
         public bool IsSinkHttp { get; set; }
+        
+        public bool IsSinkQuic { get; set; }
+        
+        public int SinkQuicPort { get; set; }
 
         public int SinkHttpPort { get; set; }
 

@@ -30,11 +30,16 @@ namespace LiveStream
                 {"sinkconsole", v => cmdArgs.IsSinkConsole = v != null},
                 {"sinkm2tcp", v => cmdArgs.IsSinkM2Tcp = v != null},
                 {"sinkm2tcpport=", (int v) => cmdArgs.SinkM2TcpPort = v},
+                {"sinkquic", v => cmdArgs.IsSinkQuic = v != null},
+                {"sinkquicport=", (int v) => cmdArgs.SinkQuicPort = v},
                 {"m2tcp", v => cmdArgs.IsSourceM2Tcp = v != null},
                 {"m2tcphost=", v => cmdArgs.M2TcpHost = v},
                 {"m2tcpport=", (int v) => cmdArgs.M2TcpPort = v},
                 {"m2tcpconn=", (int v) => cmdArgs.M2TcpConnections = v},
-                {"m2tcpreset", v => cmdArgs.M2TcpResetPackets = v != null}
+                {"m2tcpreset", v => cmdArgs.M2TcpResetPackets = v != null},
+                {"quic", v => cmdArgs.IsSourceQuic = v != null},
+                {"quichost=", v => cmdArgs.SourceQuicHost = v},
+                {"quicport=", (int v) => cmdArgs.SourceQuicPort = v},
             };
 
             try
@@ -67,7 +72,7 @@ namespace LiveStream
 
         private static void DisplayHelp(CmdArgs cmdArgs)
         {
-            Console.WriteLine("Streaming Magic TCP 0.80");
+            Console.WriteLine("Streaming Magic TCP 0.90");
             Console.WriteLine("Sources");
             Console.WriteLine("--udp          | UDP Source (default) : ");
             Console.WriteLine("--port         | UDP Port             : " + cmdArgs.UdpPort);
@@ -82,6 +87,10 @@ namespace LiveStream
             Console.WriteLine("--m2tcpconn    | M2TCP Connections    : " + cmdArgs.M2TcpConnections);
             Console.WriteLine("--m2tcpreset   | M2TCP Send reset pkt.: " + cmdArgs.M2TcpResetPackets);
             Console.WriteLine("");
+            Console.WriteLine("--quic         | QUIC Source          : " + cmdArgs.IsSourceQuic);
+            Console.WriteLine("--quichost     | QUIC Host            : " + cmdArgs.SourceQuicHost);
+            Console.WriteLine("--quicport     | QUIC Port            : " + cmdArgs.SourceQuicPort);
+            Console.WriteLine("");
             Console.WriteLine("");
             Console.WriteLine("Sinks");
             Console.WriteLine("--sinkbuffer   | Packet buffer        : " + cmdArgs.SinkBufferSize);
@@ -93,6 +102,9 @@ namespace LiveStream
             Console.WriteLine("");
             Console.WriteLine("--sinkm2tcp    | M2TCP Sink (default) : " + cmdArgs.IsSinkM2Tcp);
             Console.WriteLine("--sinkm2tcpport| M2TCP Port           : " + cmdArgs.SinkM2TcpPort);
+            Console.WriteLine("");
+            Console.WriteLine("--sinkquic     | QUIC Sink            : " + cmdArgs.IsSinkQuic);
+            Console.WriteLine("--sinkquicport | QUIC Port            : " + cmdArgs.SinkQuicPort);
             Console.WriteLine(new string('=', 80));
         }
     }
